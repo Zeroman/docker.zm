@@ -1,8 +1,11 @@
 FROM zm.base
 
 
-RUN apt-get install -y --no-install-recommends curl unzip ca-certificates x11-apps:i386 \
-        wine-development wine32-development wine32-development-preloader wine32-development-tools fonts-wine
+RUN apt-get install -y --no-install-recommends ca-certificates \
+        wine-development wine32-development wine32-development-preloader fonts-wine
+
+# wine32-development-tools x11-apps:i386
+
 
 # Use the latest version of winetricks 
 RUN curl -SL 'https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks' -o /usr/local/bin/winetricks \

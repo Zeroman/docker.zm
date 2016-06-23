@@ -10,6 +10,7 @@ run_image()
 {
     docker_opts=""
     docker_bind="" 
+    contain_params=""
 
     hostdev=false
 
@@ -22,10 +23,12 @@ run_image()
             fi
             mkdir -p $cur_dir/nfs
             docker_bind+="-v $cur_dir/nfs:/nfs"
+            contain_params+="$arg "
             hostdev=true
         elif [ "$arg" == "tftp" ];then
             mkdir -p $cur_dir/tftp
             docker_bind+=" -v $cur_dir/tftp:/srv/tftp"
+            contain_params+="$arg "
         elif [ $(expr match "$arg" ".*:.*") -ne 0 ];then
             usbs=$(lsusb | grep $arg)
             if [ -n "$usbs" ];then
@@ -37,6 +40,8 @@ run_image()
             if [ -e "/dev/$arg" ];then
                 docker_opts+=" --device=/dev/$arg"
             fi
+        else
+            contain_params+="$arg "
         fi
     done
 
@@ -66,9 +71,10 @@ run_image()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zm.cross_develop $@
+            zm.cross_develop $contain_params
     else
-        docker start -i zm.cross_develop
+        # docker start -i $name
+        docker exec -it $name bash
     fi
 }
 

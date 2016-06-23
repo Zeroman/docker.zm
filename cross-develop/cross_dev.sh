@@ -3,6 +3,7 @@
 # set -x
 
 cmd=""
+user=developer
 for arg in $*
 do
     if [ "$arg" == "nfs" ];then
@@ -16,6 +17,8 @@ do
     elif [ "$arg" == "tftp" ];then
         mkdir -p /tftp
         /etc/init.d/tftpd-hpa start
+    elif [ "$arg" == "root" ];then
+        user=root
     else
         cmd+="$arg "
     fi
@@ -26,12 +29,17 @@ echo "developer:x:${uid}:${gid}:Developer,,,:/home/developer:/bin/bash" >> /etc/
 echo "developer:x:${uid}:" >> /etc/group 
 echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer
 chmod 0440 /etc/sudoers.d/developer
+chmod 777 /dev/ttyUSB*
 # chown ${uid}:${gid} -R /home/developer
 
-if [ -n "$cmd" ];then
-    su -c "$cmd" developer
+if [ "$user" != "root" ];then
+    if [ -n "$cmd" ];then
+        su -c "$cmd" developer
+    else
+        su developer 
+    fi
 else
-    su developer 
+    bash
 fi
 
 if [ $(expr match "$*" ".*tftp") -ne 0 ];then

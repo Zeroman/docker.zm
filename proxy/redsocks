@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+
+http_port=12345
+https_port=12346
+
+index=0
+declare -a return_ips
+add_return_ip() {
+    return_ips[$index]="$1"
+    index=$(expr $index + 1)
+}
+
+add_return_ip 10.0.0.0/8 
+add_return_ip 127.0.0.0/8 
+add_return_ip 169.254.0.0/16
+add_return_ip 172.16.0.0/12
+add_return_ip 172.17.0.0/12
+add_return_ip 192.168.0.0/16
+add_return_ip 224.0.0.0/4
+add_return_ip 240.0.0.0/4
+
+default_iface=$(ip route list | grep default | head -1 | awk '{print $5}')
+
+prerouting_iptables_rules() {
+    # private ip ranges are not intercepted
+    for ip in ${return_ips[*]}
+    do
+        iptables -t nat -$1 PREROUTING -i $2 -d $ip -j RETURN
+    done
+    #iptables -t nat -$1 PREROUTING -p tcp --dport 8080 -i $2 -j REDIRECT --to ${http_port} 
+    iptables -t nat -$1 PREROUTING -p tcp --dport 80   -i $2 -j REDIRECT --to ${http_port} 
+    iptables -t nat -$1 PREROUTING -p tcp --dport 443  -i $2 -j REDIRECT --to ${https_port} 
+}
+
+default_iptables_rules() {
+    # private ip ranges are not intercepted
+    for ip in ${return_ips[*]}
+    do
+        iptables -t nat -$1 OUTPUT -d $ip -j RETURN
+    done
+    #iptables -t nat -$1 OUTPUT -p tcp --dport 8080 -j REDIRECT --to-ports ${http_port} 
+    iptables -t nat -$1 OUTPUT -p tcp --dport 80  -j REDIRECT --to-ports ${http_port} 
+    iptables -t nat -$1 OUTPUT -p tcp --dport 443 -j REDIRECT --to-ports ${https_port} 
+    if [ "$1" = 'A' ];then
+        iptables -t nat -I OUTPUT -m owner --uid-owner redsocks -j RETURN
+    else
+        iptables -t nat -$1 OUTPUT -m owner --uid-owner redsocks -j RETURN
+    fi
+
+    # enable makei a route
+    iptables -t nat -$1 POSTROUTING -o ${default_iface} -j MASQUERADE
+}
+
+make_redsocks_conf_head() {
+    (cat <<EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "stderr";
+    daemon = off;
+    user = redsocks;
+    group = redsocks;
+    redirector = iptables;
+}
+EOF
+) > /tmp/redsocks.conf
+}
+
+append_redsocks_conf() {
+  local type=$1
+  local ip=$2
+  local port=$3
+  local local_port=$4
+  if [ -z "$type" -o -z "$ip" -o -z "$port" -o -z "$local_port" ] ; then
+    echo missing required parameter >&2
+    exit 1
+  fi
+  (cat <<EOF
+redsocks {
+  type = $type;
+  ip = $ip;
+  port = $port;
+  local_ip = 0.0.0.0;
+  local_port = $local_port;
+}
+EOF
+) >> /tmp/redsocks.conf
+}
+
+parse_ip() {
+  echo $1 | sed -nE "s/^(http(s)?:\/\/)?(.+):([0-9]+)\/?$/\3/p"
+}
+
+parse_port() {
+  echo $1 | sed -nE "s/^(http(s)?:\/\/)?(.+):([0-9]+)\/?$/\4/p"
+}
+
+stop() {
+    echo "Cleaning iptables"
+    prerouting_iptables_rules D docker0
+    prerouting_iptables_rules D ${default_iface}
+    default_iptables_rules D
+    pkill -9 redsocks
+}
+
+interrupted () {
+    echo 'Interrupted, cleaning up...'
+    trap - INT
+    stop
+    kill -INT $$
+}
+
+run() {
+    trap interrupted INT
+    trap terminated TERM
+
+    make_redsocks_conf_head
+
+    if [ -n "$http_proxy" ]; then
+        ip=$(parse_ip $http_proxy)
+        port=$(parse_port $http_proxy)
+        append_redsocks_conf "http-relay" $ip $port "${http_port}"
+
+        if [ -z "$https_proxy" ]; then
+            https_proxy="$http_proxy"
+        fi
+    fi
+
+    if [ -n "$https_proxy" ]; then
+        ip=$(parse_ip $https_proxy)
+        port=$(parse_port $https_proxy)
+        append_redsocks_conf "http-connect" $ip $port "${https_port}"
+    fi
+
+    if [ -n "$ssh_proxy" ]; then
+        ip=$(parse_ip $ssh_proxy)
+        port=$(parse_port $ssh_proxy)
+        append_redsocks_conf "socks5" $ip $port "${http_port}"
+        https_port=$http_port
+    fi
+
+    prerouting_iptables_rules A docker0
+    prerouting_iptables_rules A ${default_iface}
+    default_iptables_rules A
+    /usr/sbin/redsocks -c /tmp/redsocks.conf &
+
+    tail -f /dev/null
+}
+
+
+terminated () {
+    echo 'Terminated, cleaning up...'
+    trap - TERM
+    stop
+    kill -TERM $$
+}
+
+case "$1" in
+    stop )  stop ;;
+    * )     run ;;
+esac

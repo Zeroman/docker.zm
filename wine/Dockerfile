@@ -1,11 +1,13 @@
 FROM zm.base
 
 
-RUN apt-get install -y --no-install-recommends ca-certificates \
+RUN apt-get install -y --no-install-recommends locales ca-certificates \
         wine-development wine32-development wine32-development-preloader fonts-wine
 
-# wine32-development-tools x11-apps:i386
+echo "zh_CN.GBK GBK" > /etc/locale.gen && locale-gen
+ENV LC_ALL zh_CN.GBK
 
+# wine32-development-tools x11-apps:i386
 
 # Use the latest version of winetricks 
 RUN curl -SL 'https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks' -o /usr/local/bin/winetricks \

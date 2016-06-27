@@ -4,7 +4,7 @@ FROM zm.base
 RUN apt-get install -y --no-install-recommends locales ca-certificates \
         wine-development wine32-development wine32-development-preloader fonts-wine
 
-echo "zh_CN.GBK GBK" > /etc/locale.gen && locale-gen
+RUN echo "zh_CN.GBK GBK" > /etc/locale.gen && locale-gen
 ENV LC_ALL zh_CN.GBK
 
 # wine32-development-tools x11-apps:i386

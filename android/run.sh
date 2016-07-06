@@ -5,22 +5,32 @@ cur_path=$(readlink -f $0)
 cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
-
-run_image()
+run_android_studio()
 {
     docker_opts=""
     docker_bind="" 
-    contain_params=""
 
-    hostdev=true
+    for rule in $(ls *.rules)
+    do
+        docker_bind+=" -v $PWD/$rule:/etc/udev/rules.d/$rule:ro"
+    done
 
-    if $hostdev;then
-        docker_opts+=" --privileged"
+    gradle_home="$cur_dir/.gradle"
+    if [ -e '~/.gradle' ];then
+        gradle_home=$(readlink -e '~/.gradle')
     fi
+    docker_bind+=" -v $gradle_home:/home/developer/.gradle"
 
-    if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
-    fi
+    AndroidStudioVer=2.1
+    AndroidStudioCfgDir=$cur_dir/.AndroidStudio${AndroidStudioVer}
+    mkdir -p "$AndroidStudioCfgDir"
+    cfg_dir=$(basename $AndroidStudioCfgDir)
+    docker_bind+=" -v $AndroidStudioCfgDir:/home/developer/$cfg_dir"
+
+    AndroidDir=$cur_dir/.android
+    mkdir -p $AndroidDir
+    cfg_dir=$(basename $AndroidDir)
+    docker_bind+=" -v $AndroidDir:/home/developer/$cfg_dir"
 
     for rule in "*.rules"
     do
@@ -29,18 +39,52 @@ run_image()
         fi
     done
 
-    name=zm.android-$(basename $cur_dir)
+    name="zm.android_studio_$(basename $cur_dir)"
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
-        docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+        XSOCK=/tmp/.X11-unix
+        XAUTH=/tmp/.docker.xauth
+        xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+        docker run -it --rm --name $name --privileged --net=host $docker_opts $docker_bind \
+            -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zm.android $contain_params
+            zm.android /work/android-studio/bin/studio.sh
     else
-        # docker start -i $name
-        docker exec -it $name bash
+        docker start -i $name
+    fi
+}
+
+run_gradle_image()
+{
+    docker_opts=""
+    docker_bind="" 
+
+    # docker_opts+=" --privileged"
+
+    name="android_gradle_$(basename $cur_dir)"
+
+    if [ -d  /work/android/.gradle ];then
+        docker_bind+=" -v /work/android/.gradle:/home/developer/.gradle"
+    fi
+
+    if [ -e $HOME/.bashrc ];then
+        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
+    fi
+
+    echo 'sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java'
+    id=$(docker ps -a --filter name=$name -q)
+    if [ -z "$id" ];then
+        docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+            -v /work/android:/work/android \
+            -v $cur_dir:/work/src \
+            -e UID=$UID \
+            -w /work/src \
+            zm.android $@
+    else
+        docker start -i $name
     fi
 }
 

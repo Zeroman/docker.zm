@@ -16,8 +16,8 @@ run_android_studio()
     done
 
     gradle_home="$cur_dir/.gradle"
-    if [ -e '~/.gradle' ];then
-        gradle_home=$(readlink -e '~/.gradle')
+    if [ -e "$HOME/.gradle" ];then
+        gradle_home=$(readlink -e "$HOME/.gradle")
     fi
     docker_bind+=" -v $gradle_home:/home/developer/.gradle"
 
@@ -38,6 +38,11 @@ run_android_studio()
             docker_bind+=" -v $PWD/$rule:/etc/udev/rules.d/$rule:ro"
         fi
     done
+
+    if [ -d "android-studio" ];then
+        echo "no dir android-studio"
+        return
+    fi
 
     name="zm.android_studio_$(basename $cur_dir)"
 
@@ -66,9 +71,12 @@ run_gradle_image()
 
     name="android_gradle_$(basename $cur_dir)"
 
-    if [ -d  /work/android/.gradle ];then
-        docker_bind+=" -v /work/android/.gradle:/home/developer/.gradle"
+    gradle_home="$cur_dir/.gradle"
+    if [ -e "$HOME/.gradle" ];then
+        gradle_home=$(readlink -e "$HOME/.gradle")
     fi
+    docker_bind+=" -v $gradle_home:/home/developer/.gradle"
+    echo --- $docker_bind
 
     if [ -e $HOME/.bashrc ];then
         docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
@@ -103,18 +111,24 @@ case $opt in
     bn|build_new)
         docker build -t zm.android --no-cache .
         ;;
+    as|android_studio)
+        run_android_studio
+        ;;
     r|run)
         run_image $@
         ;;
     t|test)
         test_image
         ;;
+    g|gradle)
+        run_gradle_image
+        ;;
     c|clean)
         docker rm zm.android
         docker rmi zm.android
         ;;
     *)
-        run_image $*
+        docker run -it --rm zm.android $@
         ;;
 esac
 

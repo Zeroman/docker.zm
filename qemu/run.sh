@@ -67,7 +67,7 @@ case $opt in
         docker build -t zm.qemu --no-cache .
         ;;
     r|run)
-        run_image qemu.sh $@
+        run_image /opt/qemu.sh $@
         ;;
     c|clean)
         docker rm zm.qemu

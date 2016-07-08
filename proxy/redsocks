@@ -46,7 +46,10 @@ default_iptables_rules() {
     else
         iptables -t nat -$1 OUTPUT -m owner --uid-owner redsocks -j RETURN
     fi
+}
 
+default_route_rules()
+{
     # enable makei a route
     iptables -t nat -$1 POSTROUTING -o ${default_iface} -j MASQUERADE
 }
@@ -97,10 +100,13 @@ parse_port() {
 
 stop() {
     echo "Cleaning iptables"
-    prerouting_iptables_rules D docker0
-    prerouting_iptables_rules D ${default_iface}
-    default_iptables_rules D
-    pkill -9 redsocks
+    if [ -z "$global_proxy" ]; then
+        prerouting_iptables_rules D docker0
+        prerouting_iptables_rules D ${default_iface}
+        default_iptables_rules D
+        pkill -9 redsocks
+    fi
+    default_route_rules D
 }
 
 interrupted () {
@@ -112,7 +118,8 @@ interrupted () {
 
 run() {
     trap interrupted INT
-    trap terminated TERM
+    # trap terminated TERM QUIT
+    trap terminated 15
 
     make_redsocks_conf_head
 
@@ -139,10 +146,13 @@ run() {
         https_port=$http_port
     fi
 
-    prerouting_iptables_rules A docker0
-    prerouting_iptables_rules A ${default_iface}
-    default_iptables_rules A
-    /usr/sbin/redsocks -c /tmp/redsocks.conf &
+    if [ -z "$global_proxy" ]; then
+        prerouting_iptables_rules A docker0
+        prerouting_iptables_rules A ${default_iface}
+        default_iptables_rules A
+        /usr/sbin/redsocks -c /tmp/redsocks.conf &
+    fi
+    default_route_rules A
 
     tail -f /dev/null
 }

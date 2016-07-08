@@ -8,5 +8,5 @@ RUN apt-get -qy --no-install-recommends install \
     
 ADD redsocks /root/
 
-ENTRYPOINT ["/bin/bash", "/root/redsocks"]
+ENTRYPOINT ["/root/redsocks"]
 

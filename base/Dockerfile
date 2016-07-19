@@ -13,4 +13,4 @@ RUN apt-get install -y --no-install-recommends \
         expect graphviz cscope exuberant-ctags libpython-dev sloccount \
         lzma lzop cmake python tree file cgvg exfat-utils lsof strace \
         patch wget cpio rsync net-tools automake autoconf curl unzip \
-        default-jdk 
+        default-jdk locales

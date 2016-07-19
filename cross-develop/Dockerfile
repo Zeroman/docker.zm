@@ -1,4 +1,4 @@
-FROM zm.base
+FROM zeroman/base
 
 RUN apt-get install -y --no-install-recommends \
         nfs-kernel-server ckermit tftp-hpa tftpd-hpa u-boot-tools  \

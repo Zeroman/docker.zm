@@ -14,16 +14,16 @@ run_image()
         docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
     fi
 
-    name=zm.base-$(basename $cur_dir)
+    name=zeroman/base-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
             -v $cur_dir:/work \
             -w /work \
-            zm.base $@
+            zeroman/base $@
     else
-        docker start -i zm.base
+        docker start -i zeroman/base
     fi
 }
  
@@ -32,17 +32,17 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.base .
+        docker build -t zeroman/base .
         ;;
     bn|build_new)
-        docker build -t zm.base --no-cache .
+        docker build -t zeroman/base --no-cache .
         ;;
     r|run)
         run_image $@
         ;;
     c|clean)
-        docker rm zm.base
-        docker rmi zm.base
+        docker rm zeroman/base
+        docker rmi zeroman/base
         ;;
     *)
         run_image $*

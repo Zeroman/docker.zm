@@ -44,7 +44,7 @@ run_android_studio()
         return
     fi
 
-    name="zm.android_studio_$(basename $cur_dir)"
+    name="zeroman/android_studio_$(basename $cur_dir)"
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -56,7 +56,7 @@ run_android_studio()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zm.android /work/android-studio/bin/studio.sh
+            zeroman/android /work/android-studio/bin/studio.sh
     else
         docker start -i $name
     fi
@@ -90,7 +90,7 @@ run_gradle_image()
             -v $cur_dir:/work/src \
             -e UID=$UID \
             -w /work/src \
-            zm.android $@
+            zeroman/android $@
     else
         docker start -i $name
     fi
@@ -106,10 +106,10 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.android .
+        docker build -t zeroman/android .
         ;;
     bn|build_new)
-        docker build -t zm.android --no-cache .
+        docker build -t zeroman/android --no-cache .
         ;;
     as|android_studio)
         run_android_studio
@@ -124,11 +124,11 @@ case $opt in
         run_gradle_image
         ;;
     c|clean)
-        docker rm zm.android
-        docker rmi zm.android
+        docker rm zeroman/android
+        docker rmi zeroman/android
         ;;
     *)
-        docker run -it --rm zm.android $@
+        docker run -it --rm zeroman/android $@
         ;;
 esac
 

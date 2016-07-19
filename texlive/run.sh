@@ -11,16 +11,16 @@ run_image()
     docker_opts=""
     docker_bind="" 
 
-    name=zm.texlive-$(basename $cur_dir)
+    name=zeroman/texlive-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
             -v $cur_dir:/work \
             -w /work \
-            zm.texlive $*
+            zeroman/texlive $*
     else
-        docker start -i zm.texlive
+        docker start -i zeroman/texlive
     fi
 }
 
@@ -29,17 +29,17 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.texlive .
+        docker build -t zeroman/texlive .
         ;;
     bn|build_new)
-        docker build -t zm.texlive --no-cache .
+        docker build -t zeroman/texlive --no-cache .
         ;;
     r|run)
         run_image $*
         ;;
     c|clean)
-        docker rm zm.texlive
-        docker rmi zm.texlive
+        docker rm zeroman/texlive
+        docker rmi zeroman/texlive
         ;;
     *)
         run_image $*

@@ -14,7 +14,7 @@ run_image()
         docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
     fi
 
-    name=zm.qemu-$(basename $cur_dir)
+    name=zeroman/qemu-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -25,7 +25,7 @@ run_image()
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -v $cur_dir:/work \
             -w /work \
-            zm.qemu $@
+            zeroman/qemu $@
     else
         docker exec -it $name /bin/bash
     fi
@@ -40,7 +40,7 @@ run_shell()
         docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
     fi
 
-    name=zm.qemu-$(basename $cur_dir)
+    name=zeroman/qemu-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -51,7 +51,7 @@ run_shell()
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -v $cur_dir:/work \
             -w /work \
-            zm.qemu $@
+            zeroman/qemu $@
     else
         docker exec -it $name /bin/bash
     fi
@@ -61,17 +61,17 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.qemu .
+        docker build -t zeroman/qemu .
         ;;
     bn|build_new)
-        docker build -t zm.qemu --no-cache .
+        docker build -t zeroman/qemu --no-cache .
         ;;
     r|run)
         run_image /opt/qemu.sh $@
         ;;
     c|clean)
-        docker rm zm.qemu
-        docker rmi zm.qemu
+        docker rm zeroman/qemu
+        docker rmi zeroman/qemu
         ;;
     *)
         run_shell

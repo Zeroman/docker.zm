@@ -14,16 +14,16 @@ run_image()
         docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
     fi
 
-    name=zm.archlinux-$(basename $cur_dir)
+    name=zeroman/archlinux-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
             -v $cur_dir:/work \
             -w /work \
-            zm.archlinux $@
+            zeroman/archlinux $@
     else
-        docker start -i zm.archlinux
+        docker start -i zeroman/archlinux
     fi
 }
 
@@ -79,17 +79,17 @@ case $opt in
         init_archlinux
         ;;
     b|build)
-        docker build -t zm.archlinux .
+        docker build -t zeroman/archlinux .
         ;;
     bn|build_new)
-        docker build -t zm.archlinux --no-cache .
+        docker build -t zeroman/archlinux --no-cache .
         ;;
     r|run)
         run_image $@
         ;;
     c|clean)
-        docker rm zm.archlinux
-        docker rmi zm.archlinux
+        docker rm zeroman/archlinux
+        docker rmi zeroman/archlinux
         ;;
     *)
         run_image $*

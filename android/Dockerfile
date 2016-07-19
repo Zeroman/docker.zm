@@ -1,4 +1,4 @@
-FROM zm.base
+FROM zeroman/base
 
 RUN apt-get install -y --no-install-recommends \
         zlib1g:i386 abootimg aapt android-tools-adb android-tools-fsutils android-tools-fastboot \

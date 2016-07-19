@@ -1,4 +1,4 @@
-FROM zm.archlinux
+FROM zeroman/archlinux
 
 RUN pacman -S --needed --noconfirm qemu bridge-utils
 

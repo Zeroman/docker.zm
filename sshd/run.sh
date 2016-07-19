@@ -5,7 +5,7 @@ cur_path=$(readlink -f $0)
 cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
-container_name=zm.sshd-$(basename $cur_dir)
+container_name=zeroman/sshd-$(basename $cur_dir)
 
 run_image()
 {
@@ -16,10 +16,10 @@ run_image()
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
-        docker run -d -p 2222:22 --name $name $docker_opts $docker_bind \
-            zm.sshd $@
+        docker run -d -p 4444:22 --name $name $docker_opts $docker_bind \
+            zeroman/sshd $@
     else
-        docker start -i zm.sshd
+        docker start -i zeroman/sshd
     fi
     docker port $name 
 }
@@ -29,9 +29,10 @@ test_sshd()
     if [ ! -e test_key.pub ];then
         # ssh-keygen -t rsa -f test_key
         ssh-keygen -t rsa -N 11111 -f test_key
-        ssh-copy-id -p 2222 -i test_key.pub root@localhost
+        ssh-copy-id -p 4444 -i test_key.pub root@localhost
     fi
-    ssh -p 2222 -i test_key root@localhost 
+    echo "key pwd is 11111"
+    ssh -p 4444 -i test_key root@localhost 
 }
  
 
@@ -39,10 +40,10 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.sshd .
+        docker build -t zeroman/sshd .
         ;;
     bn|build_new)
-        docker build -t zm.sshd --no-cache .
+        docker build -t zeroman/sshd --no-cache .
         ;;
     r|run)
         run_image $@
@@ -57,7 +58,7 @@ case $opt in
         docker stop $container_name
         docker rm  $container_name
         rm -fv test_key*
-        # docker rmi zm.sshd
+        # docker rmi zeroman/sshd
         ;;
     *)
         run_image $*

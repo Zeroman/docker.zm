@@ -11,7 +11,7 @@ run_image()
     docker_opts=""
     docker_bind="" 
 
-    name=zm.wine-$(basename $cur_dir)
+    name=zeroman/wine-$(basename $cur_dir)
 
     docker_bind+="-v $PWD/.wine:/root/.wine" 
 
@@ -35,7 +35,7 @@ run_image()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zm.wine $@
+            zeroman/wine $@
     else
         docker start -i $name
     fi
@@ -64,19 +64,19 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.wine .
+        docker build -t zeroman/wine .
         ;;
     bn|build_new)
-        docker build -t zm.wine --no-cache .
+        docker build -t zeroman/wine --no-cache .
         ;;
     r|run)
         run_image $@
         ;;
     c|clean)
-        docker rm zm.wine-$(basename $cur_dir)
+        docker rm zeroman/wine-$(basename $cur_dir)
         ;;
     ci|clean_image)
-        docker rmi zm.wine
+        docker rmi zeroman/wine
         ;;
     cn|chinese_font)
         wine_zhcn_font

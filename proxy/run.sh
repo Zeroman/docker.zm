@@ -36,7 +36,7 @@ proxy_env()
     esac
 }
 
-run_docker_proxy()
+run_zm_proxy()
 {
     proxy_env $1
 
@@ -52,7 +52,7 @@ run_docker_proxy()
         docker stop proxy
         docker rm proxy
     fi
-    docker $docker_opts docker.proxy
+    docker $docker_opts zeroman/proxy
 }
 
 
@@ -72,24 +72,24 @@ case $1 in
         echo $1 | sudo tee /proc/sys/net/ipv4/ip_forward
         ;;
     b|build)
-        docker build -t docker.proxy .
+        docker build -t zeroman/proxy .
         ;;
     bn|build_new)
-        docker build -t docker.proxy --no-cache .
+        docker build -t zeroman/proxy --no-cache .
         ;;
     r|run)
         shift
-        run_docker_proxy $@
+        run_zm_proxy $@
         ;;
     c|clean)
         docker rm proxy
-        docker rmi docker.proxy 
+        docker rmi zeroman/proxy 
         ;;
     test)
         shift
         run_local_proxy $@
         ;;
     *)
-        run_docker_proxy $@
+        run_zm_proxy $@
         ;;
 esac

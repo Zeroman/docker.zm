@@ -63,7 +63,7 @@ run_image()
         fi
     done
 
-    name=zm.cross_develop-$(basename $cur_dir)
+    name=zeroman/cross_develop-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -71,7 +71,7 @@ run_image()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zm.cross_develop $contain_params
+            zeroman/cross_develop $contain_params
     else
         # docker start -i $name
         docker exec -it $name bash
@@ -105,10 +105,10 @@ opt=$1
 shift
 case $opt in
     b|build)
-        docker build -t zm.cross_develop .
+        docker build -t zeroman/cross_develop .
         ;;
     bn|build_new)
-        docker build -t zm.cross_develop --no-cache .
+        docker build -t zeroman/cross_develop --no-cache .
         ;;
     r|run)
         run_image $@
@@ -119,8 +119,8 @@ case $opt in
     c|clean)
         rmdir nfs
         rmdir tftp
-        docker rm zm.cross_develop
-        docker rmi zm.cross_develop
+        docker rm zeroman/cross_develop
+        docker rmi zeroman/cross_develop
         ;;
     *)
         run_image $*

@@ -63,7 +63,7 @@ run_image()
         fi
     done
 
-    name=zeroman/cross_develop-$(basename $cur_dir)
+    name=zeroman.cross_develop-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then

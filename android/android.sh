@@ -8,7 +8,7 @@ chmod 0440 /etc/sudoers.d/developer
 chown ${uid}:${gid} /home/developer
 
 if [ -z "$@" ];then
-    su developer 
+    su -c /opt/android-studio/bin/studio.sh developer 
 else
     su -c "$@" developer
 fi

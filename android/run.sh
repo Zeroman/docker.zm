@@ -28,6 +28,9 @@ run_android_studio()
     docker_bind+=" -v $AndroidStudioCfgDir:/home/developer/$cfg_dir"
 
     AndroidDir=$cur_dir/.android
+    if [ -e "$HOME/.android" ];then
+        AndroidDir=$(readlink -e "$HOME/.android")
+    fi
     mkdir -p $AndroidDir
     cfg_dir=$(basename $AndroidDir)
     docker_bind+=" -v $AndroidDir:/home/developer/$cfg_dir"
@@ -44,7 +47,7 @@ run_android_studio()
         return
     fi
 
-    name="zeroman/android_studio_$(basename $cur_dir)"
+    name="android_studio_$(basename $cur_dir)"
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -56,7 +59,7 @@ run_android_studio()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zeroman/android /work/android-studio/bin/studio.sh
+            zeroman/android /opt/android-studio/bin/studio.sh
     else
         docker start -i $name
     fi
@@ -99,12 +102,29 @@ run_gradle_image()
 test_image()
 {
     echo "test now" 
+    name="android_gradle_$(basename $cur_dir)"
+    docker run -it --rm --name $name zeroman/android /bin/bash
+}
+
+download_android_studio()
+{
+    ver='2.1.2.0'
+    filever='143.2915827'
+    filename=android-studio-ide-${filever}-linux.zip
+    sha1sum='d34c75ae2ca1cf472e21eb5301f43603082c6fd0'
+    if ! echo "$sha1sum $filename" | sha1sum -c ;then
+        wget -c https://dl.google.com/dl/android/studio/ide-zips/${ver}/${filename} -O ${filename}
+    fi
+    ln -sfv ${filename} android-studio-ide-linux.zip 
 }
 
 
 opt=$1
 shift
 case $opt in
+    download)
+        download_android_studio
+        ;;
     b|build)
         docker build -t zeroman/android .
         ;;
@@ -115,7 +135,10 @@ case $opt in
         run_android_studio
         ;;
     r|run)
-        run_image $@
+        test_image $@
+        ;;
+    shell)
+        run_image /bin/bash
         ;;
     t|test)
         test_image

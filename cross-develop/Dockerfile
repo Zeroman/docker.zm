@@ -6,10 +6,6 @@ RUN apt-get install -y --no-install-recommends \
         cutils icheck cccc cppcheck cproto astyle indent highlight source-highlight \
         gdb valgrind mtd-utils sqlite qt4-dev-tools fakeroot 
 
-ENV UID 1000
-
-RUN mkdir -p -m 0777 /home/developer 
-
 ADD cross_dev.sh /bin/cross_dev.sh
 
 ENTRYPOINT ["/bin/cross_dev.sh"]

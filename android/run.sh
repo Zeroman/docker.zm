@@ -42,7 +42,7 @@ run_android_studio()
         fi
     done
 
-    if [ -d "android-studio" ];then
+    if [ ! -d "android-studio" ];then
         echo "no dir android-studio"
         return
     fi
@@ -59,7 +59,7 @@ run_android_studio()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zeroman/android /opt/android-studio/bin/studio.sh
+            zeroman/android /work/android-studio/bin/studio.sh
     else
         docker start -i $name
     fi
@@ -103,7 +103,7 @@ test_image()
 {
     echo "test now" 
     name="android_gradle_$(basename $cur_dir)"
-    docker run -it --rm --name $name zeroman/android /bin/bash
+    docker run -it --rm --privileged --name $name zeroman/android /bin/bash
 }
 
 download_android_studio()
@@ -115,7 +115,11 @@ download_android_studio()
     if ! echo "$sha1sum $filename" | sha1sum -c ;then
         wget -c https://dl.google.com/dl/android/studio/ide-zips/${ver}/${filename} -O ${filename}
     fi
-    ln -sfv ${filename} android-studio-ide-linux.zip 
+    if [ ! -e android-studio.tar ];then
+        unzip ${filename}
+        tar cvf android-studio.tar android-studio
+    fi
+    # ln -sfv ${filename} android-studio-ide-linux.zip 
 }
 
 

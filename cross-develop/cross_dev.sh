@@ -24,13 +24,9 @@ do
     fi
 done
 
-export uid=$UID gid=$UID 
-echo "developer:x:${uid}:${gid}:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd 
-echo "developer:x:${uid}:" >> /etc/group 
-echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer
-chmod 0440 /etc/sudoers.d/developer
-chmod 777 /dev/ttyUSB*
-# chown ${uid}:${gid} -R /home/developer
+if [ -e /dev/ttyUSB[0-9] ];then
+    chmod 777 /dev/ttyUSB[0-9]
+fi
 
 if [ "$user" != "root" ];then
     if [ -n "$cmd" ];then

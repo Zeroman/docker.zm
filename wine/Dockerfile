@@ -1,7 +1,5 @@
 FROM zeroman/base
 
-RUN apt-get install -y --no-install-recommends ca-certificates 
-
 RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # echo '\nLANG="zh_CN.GB2312"\nLANGUAGE="zh_CN:zh"' > /etc/default/locale 

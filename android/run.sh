@@ -5,36 +5,11 @@ cur_path=$(readlink -f $0)
 cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
-run_android_studio()
+android_dir=/work/android
+
+
+common_settings()
 {
-    docker_opts=""
-    docker_bind="" 
-
-    for rule in $(ls *.rules)
-    do
-        docker_bind+=" -v $PWD/$rule:/etc/udev/rules.d/$rule:ro"
-    done
-
-    gradle_home="$cur_dir/.gradle"
-    if [ -e "$HOME/.gradle" ];then
-        gradle_home=$(readlink -e "$HOME/.gradle")
-    fi
-    docker_bind+=" -v $gradle_home:/home/developer/.gradle"
-
-    AndroidStudioVer=2.1
-    AndroidStudioCfgDir=$cur_dir/.AndroidStudio${AndroidStudioVer}
-    mkdir -p "$AndroidStudioCfgDir"
-    cfg_dir=$(basename $AndroidStudioCfgDir)
-    docker_bind+=" -v $AndroidStudioCfgDir:/home/developer/$cfg_dir"
-
-    AndroidDir=$cur_dir/.android
-    if [ -e "$HOME/.android" ];then
-        AndroidDir=$(readlink -e "$HOME/.android")
-    fi
-    mkdir -p $AndroidDir
-    cfg_dir=$(basename $AndroidDir)
-    docker_bind+=" -v $AndroidDir:/home/developer/$cfg_dir"
-
     for rule in "*.rules"
     do
         if [ -e $rule ];then
@@ -42,7 +17,40 @@ run_android_studio()
         fi
     done
 
-    if [ ! -d "android-studio" ];then
+    AndroidDir=$android_dir/.android
+    if [ -e "$HOME/.android" ];then
+        AndroidDir=$(readlink -e "$HOME/.android")
+    fi
+    mkdir -p $AndroidDir
+    docker_bind+=" -v $AndroidDir:/home/developer/.android"
+
+    gradle_home="$android_dir/.gradle"
+    if [ -e "$HOME/.gradle" ];then
+        gradle_home=$(readlink -e "$HOME/.gradle")
+    fi
+    docker_bind+=" -v $gradle_home:/home/developer/.gradle"
+
+    if [ -e $HOME/.bashrc ];then
+        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
+    fi
+
+    docker_opts+=" --privileged --net=host"
+}
+
+run_android_studio()
+{
+    docker_opts=""
+    docker_bind="" 
+
+    common_settings
+
+    AndroidStudioVer=2.1
+    AndroidStudioCfgDir=$android_dir/.AndroidStudio${AndroidStudioVer}
+    mkdir -p "$AndroidStudioCfgDir"
+    cfg_dir=$(basename $AndroidStudioCfgDir)
+    docker_bind+=" -v $AndroidStudioCfgDir:/home/developer/$cfg_dir"
+
+    if [ ! -d "$android_dir/android-studio" ];then
         echo "no dir android-studio"
         return
     fi
@@ -54,12 +62,12 @@ run_android_studio()
         XSOCK=/tmp/.X11-unix
         XAUTH=/tmp/.docker.xauth
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
-        docker run -it --rm --name $name --privileged --net=host $docker_opts $docker_bind \
+        docker run -it --rm --name $name $docker_opts $docker_bind \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
+            -v $android_dir:/work/android \
             -v $cur_dir:/work \
-            -e UID=$UID \
             -w /work \
-            zeroman/android /work/android-studio/bin/studio.sh
+            zeroman/android $android_dir/android-studio/bin/studio.sh
     else
         docker start -i $name
     fi
@@ -70,34 +78,49 @@ run_gradle_image()
     docker_opts=""
     docker_bind="" 
 
-    # docker_opts+=" --privileged"
+    common_settings
 
     name="android_gradle_$(basename $cur_dir)"
 
-    gradle_home="$cur_dir/.gradle"
-    if [ -e "$HOME/.gradle" ];then
-        gradle_home=$(readlink -e "$HOME/.gradle")
-    fi
-    docker_bind+=" -v $gradle_home:/home/developer/.gradle"
-    echo --- $docker_bind
 
-    if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
-    fi
-
-    echo 'sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java'
+    # echo 'sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java'
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
-        docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+        docker run -it --rm --name $name $docker_opts $docker_bind \
             -v /work/android:/work/android \
             -v $cur_dir:/work/src \
-            -e UID=$UID \
             -w /work/src \
             zeroman/android $@
     else
         docker start -i $name
     fi
 }
+
+run_common_image()
+{
+    docker_opts=""
+    docker_bind="" 
+
+    common_settings
+
+    name="android_$(basename $cur_dir)"
+
+    id=$(docker ps -a --filter name=$name -q)
+    if [ -z "$id" ];then
+        XSOCK=/tmp/.X11-unix
+        XAUTH=/tmp/.docker.xauth
+        xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+        docker run -it --rm --name $name $docker_opts $docker_bind \
+            -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
+            -v /work/android:/work/android \
+            -v $cur_dir:/work/src \
+            -w /work/src \
+            zeroman/android $@
+    else
+        docker start -i $name
+    fi
+}
+
 
 test_image()
 {
@@ -122,6 +145,24 @@ download_android_studio()
     # ln -sfv ${filename} android-studio-ide-linux.zip 
 }
 
+run_avd()
+{
+    android_tools_dir=$android_dir/sdk/tools
+    lib64dir=$android_tools_dir/lib64
+    export LD_LIBRARY_PATH=$lib64dir:$lib64dir/qt/lib:$lib64dir/libstdc++:$lib64dir/gles_mesa:$lib64dir/gles_swiftshader
+    export PATH=$android_tools_dir:$PATH
+    #Galaxy_Nexus_API_24
+    emulator64-x86 -netdelay none -netspeed full -avd 6_0 -skin 720x1280 -accel on
+}
+
+run_sdk_manager()
+{
+    android_tools_dir=$android_dir/sdk/tools
+    export LD_LIBRARY_PATH=$android_tools_dir/lib64
+    export PATH=$android_tools_dir:$PATH
+    android
+}
+
 
 opt=$1
 shift
@@ -143,6 +184,15 @@ case $opt in
         ;;
     shell)
         run_image /bin/bash
+        ;;
+    avd)
+        run_avd
+        ;;
+    a)
+        run_common_image /work/src/run.sh avd
+        ;;
+    sdk)
+        run_sdk_manager
         ;;
     t|test)
         test_image

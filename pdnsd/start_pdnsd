@@ -1,0 +1,53 @@
+#!/usr/bin/env sh
+
+stop() {
+    echo "Cleaning iptables"
+    pkill -9 pdnsd
+}
+
+interrupted () {
+    echo 'Interrupted, cleaning up...'
+    trap - INT
+    stop
+    kill -INT $$
+}
+
+run() {
+
+    trap interrupted INT
+    trap terminated TERM
+
+    if [ -n "$SERVERIP" ];then
+        sed -i "s/\tip.*=.*/\tip=$SERVERIP;/g" /etc/pdnsd.conf
+    fi
+
+    for host in $@
+    do
+        ip=${host//:*}
+        name=${host##*:}
+        echo "$ip - $name"
+        echo "
+    rr {
+        name = $name;
+        a = $ip;
+    }
+        " >>  /etc/pdnsd.conf
+    done
+
+    pdnsd
+
+    tail -f /dev/null
+}
+
+
+terminated () {
+    echo 'Terminated, cleaning up...'
+    trap - TERM
+    stop
+    kill -TERM $$
+}
+
+case "$1" in
+    stop )  stop ;;
+    * )     run $@;;
+esac

@@ -91,6 +91,7 @@ case $opt in
         # docker rmi zeroman/svn
         sudo rm -rf svn_repo
         sudo rm -rf svn_local
+        sudo rm -rf test_prj
         ;;
     *)
         run_image $*

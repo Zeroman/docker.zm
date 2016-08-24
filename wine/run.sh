@@ -11,7 +11,7 @@ run_image()
     docker_opts=""
     docker_bind="" 
 
-    name=zeroman/wine-$(basename $cur_dir)
+    name=wine-$(basename $cur_dir)
 
     docker_bind+="-v $PWD/.wine:/root/.wine" 
 

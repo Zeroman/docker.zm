@@ -50,7 +50,7 @@ download_file()
             wget -c $1 -O $2
         fi
     else
-        wget -O $2 $1 
+        wget -c -O $2 $1 
     fi
 
     if [ -n "$md5" ];then
@@ -63,13 +63,17 @@ init_archlinux()
     dl_dir=$PWD
     zm_arch='x86_64'
     src_url='http://mirrors.163.com'
+    rm -fv md5sums.txt
     md5sum_file=$dl_dir/md5sums.txt
     download_file $src_url/archlinux/iso/latest/md5sums.txt $md5sum_file
     bootstrap_file=$(cat $md5sum_file | grep $zm_arch | awk '{print $2}')
     bootstrap_md5=$(cat $md5sum_file | grep $zm_arch | awk '{print $1}')
     download_file $src_url/archlinux/iso/latest/$bootstrap_file $bootstrap_file $bootstrap_md5
-    tar xvf archlinux-bootstrap-2016.07.01-x86_64.tar.gz 
+    rm -rf archlinux.tar.gz root.x86_64
+    tar xvf $bootstrap_file
     tar czvf archlinux.tar.gz -C root.x86_64/ .
+    rm -rf archlinux.tar.gz root.x86_64
+    rm -fv md5sums.txt
 }
 
 opt=$1

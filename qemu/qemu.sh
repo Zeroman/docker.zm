@@ -421,7 +421,7 @@ initConfig()
         ich9_cfg_path=$cur_file_dir/ich9-ehci-uhci.cfg
     fi
 
-    spice_sets="-vga qxl -spice port=$spicePort,image-compression=off,jpeg-wan-compression=auto,zlib-glz-wan-compression=auto,streaming-video=all,playback-compression=on,agent-mouse=on,disable-ticketing"
+    spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing"
     spice_sets+=" -device virtio-serial 
     -chardev spicevmc,id=vdagent,debug=0,name=vdagent 
     -device virtserialport,chardev=vdagent,name=com.redhat.spice.0 
@@ -490,9 +490,9 @@ kvmExcute()
             ;;
         --spice)
             shift
-            $QEMU $common_sets $spice_sets $@ 
-            # sleep 3
-            # $spice_client -f -h 127.0.0.1 -p $spicePort --title "$spiceTitle"
+            $QEMU $common_sets $spice_sets $@ &
+            sleep 3
+            $spice_client -f -h 127.0.0.1 -p $spicePort --title "$spiceTitle"
             ;;
         --local)
             $QEMU $common_sets -vga virtio

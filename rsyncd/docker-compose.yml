@@ -1,0 +1,7 @@
+rsyncd:
+    image: zeroman/rsyncd
+    ports:
+        - "873:873"
+    volumes:
+        - ./share:/share
+    restart: always

@@ -39,7 +39,7 @@ proc_common_rules()
         $iptable_common -p tcp -j REDIRECT --dport 443 --to-ports ${https_port} 
     fi
     if [ -n "$ssh_proxy" ]; then
-        $iptable_common -p tcp -j REDIRECT --to-ports ${ssh_port}
+        $iptable_common -p tcp -j REDIRECT --to-ports ${http_port}
     fi
 }
 

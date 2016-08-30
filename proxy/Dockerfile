@@ -4,8 +4,11 @@ RUN apt-get -qy --no-install-recommends install \
     iptables \
     procps \
     psmisc \
-    redsocks
-    
+    redsocks \
+    python-pip
+
+RUN pip install shadowsocks==2.8.2
+
 ADD redsocks /root/
 
 ENTRYPOINT ["/root/redsocks"]

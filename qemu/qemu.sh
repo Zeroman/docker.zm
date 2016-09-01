@@ -293,7 +293,7 @@ kvmConfig()
                 ;;
             --create-img) create_img="yes";shift;
                 ;;
-            --daemonize) shift; daemonize=true;
+            -d|--daemonize) shift; daemonize=true;
                 ;;
             --append) shift; other_args="$1"; shift;
                 ;;
@@ -499,10 +499,10 @@ kvmExcute()
             ;;
         --spice)
             shift
-            echo $spice_sets
-            $QEMU $common_sets $spice_sets $@ &
-            sleep 3
-            $spice_client -f -h 127.0.0.1 -p $spicePort --title "$spiceTitle"
+	    echo $spice_sets
+            $QEMU $common_sets $spice_sets $@
+            # sleep 3
+            # $spice_client -f -h 127.0.0.1 -p $spicePort --title "$spiceTitle"
             ;;
         --local)
             $QEMU $common_sets -vga virtio

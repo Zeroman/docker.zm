@@ -15,7 +15,8 @@ RUN apt-get install -y --no-install-recommends \
         patch wget cpio rsync net-tools automake autoconf curl unzip \
         locales sqlite ca-certificates openssl
 
-# RUN apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
+        python-pip
 
 
 ARG UID=1000

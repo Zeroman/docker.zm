@@ -422,10 +422,11 @@ initConfig()
     fi
 
     spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing"
-    spice_sets+=" -device virtio-serial 
-    -chardev spicevmc,id=vdagent,debug=0,name=vdagent 
-    -device virtserialport,chardev=vdagent,name=com.redhat.spice.0 
-    -device ich9-usb-ehci1,id=usb 
+    # for agent copy and paste
+    spice_sets+=" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
+    spice_sets+=" -device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
+    # for usb redirection
+    spice_sets+=" -device ich9-usb-ehci1,id=usb 
     -device ich9-usb-uhci1,masterbus=usb.0,firstport=0,multifunction=on 
     -device ich9-usb-uhci2,masterbus=usb.0,firstport=2 
     -device ich9-usb-uhci3,masterbus=usb.0,firstport=4 
@@ -435,6 +436,14 @@ initConfig()
     -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2 
     -chardev spicevmc,name=usbredir,id=usbredirchardev3 
     -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3"
+    # for CAC smartcard redirection, spicy:--spice-smartcard
+    # spice_sets+=" -device usb-ccid -chardev spicevmc,name=smartcard -device ccid-card-passthru,chardev=ccid"
+    # Multiple monitor support
+    # spice_sets+=" -vga qxl -device qxl"
+
+    #for share dir
+    # spice_sets+=" -device virtserialport,chardev=charchannel1,id=channel1,name=org.spice-space.webdav.0 
+    # -chardev spiceport,name=org.spice-space.webdav.0,id=charchannel1"
 
     if [ -n "$sd_img" ];then
         if [ ! -e "$sd_img" ];then
@@ -490,6 +499,7 @@ kvmExcute()
             ;;
         --spice)
             shift
+            echo $spice_sets
             $QEMU $common_sets $spice_sets $@ &
             sleep 3
             $spice_client -f -h 127.0.0.1 -p $spicePort --title "$spiceTitle"

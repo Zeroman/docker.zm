@@ -19,7 +19,6 @@ add_return_ip 172.17.0.0/12
 add_return_ip 192.168.0.0/16
 add_return_ip 224.0.0.0/4
 add_return_ip 240.0.0.0/4
-add_return_ip 45.79.91.227
 
 default_iface=$(ip route list | grep default | head -1 | awk '{print $5}')
 

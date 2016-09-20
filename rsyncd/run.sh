@@ -40,7 +40,8 @@ case $opt in
         docker rmi zeroman/rsyncd
         ;;
     test)
-        rsync localhost::share 
+        # rsync localhost::share 
+        rsync rsync://localhost:/share 
         ;;
     *)
         run_image $*

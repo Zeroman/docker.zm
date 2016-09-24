@@ -390,6 +390,9 @@ initConfig()
 
     if [ -z "$macaddr" ];then
         macaddr=08:00:27:23:35:32
+        if [ -n "$sys_img" -a -n "$work_img" ];then
+            macaddr=$(printf 'DE:AD:BE:EF:%02X:%02X\n' $((0x$(sha1sum <<<$sys_img|cut -c1-2))) $((0x$(sha1sum <<<$work_img|cut -c1-2))))
+        fi
     fi
     net_sets="-net nic,model=$net_dev_type,macaddr=$macaddr"
     case $net_dev in

@@ -394,18 +394,18 @@ initConfig()
             macaddr=$(printf 'DE:AD:BE:EF:%02X:%02X\n' $((0x$(sha1sum <<<$sys_img|cut -c1-2))) $((0x$(sha1sum <<<$work_img|cut -c1-2))))
         fi
     fi
-    net_sets="-net nic,model=$net_dev_type,macaddr=$macaddr"
+    net_sets=" -device $net_dev_type,netdev=net.$net_dev.0"
     case $net_dev in
         user)
-            net_sets+=" -net user"
+            net_sets+=" -netdev user,id=net.$net_dev.0,ipv6=off"
             test -n "$net_user_args" && net_sets+=",$net_user_args"
             ;;
         tap)
-            net_sets+=" -net tap"
+            net_sets+=" -netdev tap,id=net.$net_dev.0"
             test -n "$net_tap_args" && net_sets+=",$net_tap_args"
             ;;
         bridge)
-            net_sets+=" -net bridge"
+            net_sets+=" -netdev bridge,id=net.$net_dev.0"
             test -n "$net_bridge_args" && net_sets+=",$net_bridge_args"
             ;;
         *)

@@ -1,0 +1,11 @@
+FROM alpine:latest
+# FROM zeroman/archlinux
+
+RUN apk update && apk add qemu-img \
+  qemu-system-x86_64 \
+  qemu-system-i386 \ 
+  && mkdir -p /opt 
+
+ADD qemu.sh asus.bin bios.bin /opt/
+
+# ENTRYPOINT ["tail", "-f", "/var/log/pacman.log"]

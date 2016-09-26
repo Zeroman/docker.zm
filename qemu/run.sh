@@ -40,7 +40,7 @@ run_shell()
         docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
     fi
 
-    name=zeroman/qemu-$(basename $cur_dir)
+    name=zeroman.qemu-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then

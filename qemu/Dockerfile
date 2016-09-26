@@ -1,7 +1,7 @@
-FROM zeroman/archlinux
+FROM zeroman/base
 
-RUN pacman -S --needed --noconfirm qemu bridge-utils
+RUN apt-get install -y --no-install-recommends -t jessie-backports bridge-utils qemu-system-x86 qemu-kvm
 
 ADD qemu.sh asus.bin bios.bin /opt/
 
-ENTRYPOINT ["tail", "-f", "/var/log/pacman.log"]
+ENTRYPOINT ["/opt/qemu.sh"]

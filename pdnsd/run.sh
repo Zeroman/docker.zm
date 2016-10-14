@@ -19,11 +19,14 @@ run_docker_dnsd()
 
 case $1 in
     b|build)
-        docker build -t dnsd .
+        docker build -t zeroman/dnsd .
         ;;
     r|run)
         shift
         run_docker_dnsd $@
+        ;;
+    d|daemon)
+        sudo docker run --restart=always -d zeroman/dnsd
         ;;
     c|clean)
         docker rm dnsd

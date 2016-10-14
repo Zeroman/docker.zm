@@ -23,12 +23,9 @@ proxy_env()
             export http_proxy=http://proxymsn.zte.com.cn:80
             export https_proxy=https://proxymsn.zte.com.cn:80
             ;;
-        local)
-            export http_proxy=http://10.72.24.223:9998
-            export https_proxy=https://10.72.24.223:9998
-            ;;
         ssh)
             export ssh_proxy=127.0.0.1:7070
+            export ssh_server=*:22
             ;;
         *)
             export global_proxy="yes"

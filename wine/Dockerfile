@@ -36,3 +36,5 @@ ENV LC_ALL zh_CN.UTF-8
 
 # cp wine_gecko-2.47-x86.msi /root/.cache/wine/
 # wineboot -u
+
+USER developer

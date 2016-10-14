@@ -155,6 +155,13 @@ run() {
         if [ -n "$port" ];then
             ssh_port=$port
         fi
+        if [ -n "$ssh_server" ];then
+            ip=$(parse_ip $ssh_server)
+            port=$(parse_port $ssh_server)
+            if [ -n "$ip" -a "$ip" != '*' ];then
+                add_return_ip "$ip"
+            fi
+        fi
         echo "ssh forwarding prot is $ssh_port."
         append_redsocks_conf "socks5" $ip $ssh_port "${http_port}"
         https_port=$http_port

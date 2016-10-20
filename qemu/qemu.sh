@@ -112,6 +112,11 @@ start_bridge()
     local brname=$2
     local tapname=$3
 
+    if [ -z "$iface" -o -z "$brname" -o -z "$tapname" ];then
+        echo "start bridge param error"
+        return
+    fi
+
     if ! brctl show | grep -w "$brname";then
         sudo brctl addbr $brname
     fi
@@ -119,17 +124,29 @@ start_bridge()
         sudo ip tuntap add dev $tapname mode tap user $USER
     fi
 
-    sudo brctl addif $brname $iface
-    sudo brctl addif $brname $tapname
+    if ! brctl show $brname | grep -w $iface;then
+        sudo brctl addif $brname $iface
+    fi
+    if ! brctl show $brname | grep -w $tapname;then
+        sudo brctl addif $brname $tapname
+    fi
 
-    local ipaddr=$(ip -f inet addr show dev $iface | sed -n 's/^ *inet *\([.0-9/]*\).*/\1/p')
-    local gateway=$(ip route list | sed -n "s/^default via \([.0-9]*\) dev $iface.*/\1/p")
+    if ip link show $brname | grep DOWN;then
+        sudo ip link set $brname up
+    fi
 
-    sudo ip link set $brname up
-    sudo ip link set $tapname up
+    if ip link show $tapname | grep DOWN;then
+        sudo ip link set $tapname up
+    fi
 
-    test -n "$ipaddr" && sudo ip addr replace $ipaddr dev $brname
-    test -n "$gateway" && sudo ip route replace default via $gateway dev $brname
+    if ! ip -f inet addr show $brname | grep -w inet;then
+        ipaddr=$(ip -f inet addr show dev $iface | grep -w inet | awk '{print $2,$3,$4}')
+        sudo ip addr add $ipaddr dev $brname
+        if sudo ip route list | grep "default via .* dev $iface";then
+            sudo ip route list | grep 'default via' | sed "s/$iface/$brname/g" | sudo xargs ip route replace
+        fi
+        sudo ip addr del $ipaddr dev $iface
+    fi
 }
 
 stop_bridge()
@@ -138,11 +155,31 @@ stop_bridge()
     local brname=$2
     local tapname=$3
 
-    sudo ip link set $brname down
-    sudo brctl delif $brname $tapname
-    sudo brctl delif $brname $iface
-    sudo ip tuntap del dev $tapname mode tap
-    sudo brctl delbr $brname
+    if [ -z "$iface" -o -z "$brname" -o -z "$tapname" ];then
+        echo "stop bridge param error"
+        return
+    fi
+
+
+    if ! ip -f inet addr show $iface | grep -w inet > /dev/null;then
+        ipaddr=$(ip -f inet addr show dev $brname | grep -w inet | awk '{print $2,$3,$4}')
+        sudo ip addr add $ipaddr dev $iface
+        if sudo ip route list | grep "default via .* dev $brname";then
+            sudo ip route list | grep "default via .* dev $brname" | sed "s/$brname/$iface/g" | sudo xargs ip route replace
+        fi
+        sudo ip addr del $ipaddr dev $brname
+    fi
+
+    if brctl show | grep -w "$brname";then
+        sudo ip link set $brname down
+        sudo brctl delif $brname $tapname
+        sudo brctl delif $brname $iface
+        sudo brctl delbr $brname
+    fi
+
+    if ip tuntap show | grep -w "$tapname";then
+        sudo ip tuntap del dev $tapname mode tap
+    fi
 }
 
 use_bridge_net()
@@ -179,7 +216,7 @@ use_bridge_net()
         err "tap name is null"
     fi
 
-    local brname=brkvm
+    local brname=br_qemu
 
     # $((RANDOM%256)) $((RANDOM%256))
     macaddr=$(printf 'DE:AD:BE:EF:%02X:%02X\n' $((0x$(sha1sum <<<$brname|cut -c1-2))) $((0x$(sha1sum <<<$tapname|cut -c1-2))))
@@ -301,11 +338,17 @@ kvmConfig()
                 ;;
             --net-user-args) shift; net_user_args="$1"; shift
                 ;;
+            --hostfwd-ports) shift; hostfwd_args="$1"; shift
+                ;;
             --net-tap-args) shift; net_tap_args="$1"; shift
                 ;;
             --net-bridge-args) shift; net_bridge_args="$1"; shift
                 ;;
             --use-bridge) shift; use_bridge_net $1; shift
+                ;;
+            --start-bridge) shift; start_bridge $1 $2 $3; shift 3;
+                ;;
+            --stop-bridge) shift; stop_bridge $1 $2 $3; shift 3;
                 ;;
             *) argv+="$1 "; shift; 
                 ;;
@@ -399,6 +442,7 @@ initConfig()
         user)
             net_sets+=" -netdev user,id=net.$net_dev.0,ipv6=off"
             test -n "$net_user_args" && net_sets+=",$net_user_args"
+            test -n "$hostfwd_args" && net_sets+=$(echo ","$(python -c "print(','.join(['hostfwd=tcp::%s-:%s' % (i, i) for i in [$hostfwd_args]]))"))
             ;;
         tap)
             net_sets+=" -netdev tap,id=net.$net_dev.0"

@@ -123,7 +123,7 @@ case $opt in
         docker rmi zeroman/cross_develop
         ;;
     *)
-        run_image $*
+        run_image $opt $*
         ;;
 esac
 

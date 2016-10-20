@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  usms_proxy:
+    restart: always
+    image: nginx:alpine
+    volumes:
+    - ./usms.conf:/etc/nginx/conf.d/default.conf
+    - ./usms.crt:/etc/nginx/certs/usms.crt
+    - ./usms.key:/etc/nginx/certs/usms.key
+    ports:
+    - "80:80"
+    - "443:443"
+    - "1247:1247"
+    - "44300:44300"

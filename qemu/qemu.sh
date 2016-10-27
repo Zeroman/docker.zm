@@ -254,6 +254,7 @@ usage()
     --boot-iso
     --with-iso test.iso
     --with-disk /dev/sdb
+    --version
 excute:
     --start-server-vnc
     --conncet-vnc
@@ -349,6 +350,9 @@ kvmConfig()
             --start-bridge) shift; start_bridge $1 $2 $3; shift 3;
                 ;;
             --stop-bridge) shift; stop_bridge $1 $2 $3; shift 3;
+                ;;
+            --version)
+                $QEMU --version;exit 0;
                 ;;
             *) argv+="$1 "; shift; 
                 ;;

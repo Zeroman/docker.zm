@@ -74,7 +74,7 @@ case $opt in
         docker rmi zeroman/qemu
         ;;
     *)
-        run_shell
+        run_shell $opt $@
         ;;
 esac
 

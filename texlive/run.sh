@@ -11,7 +11,7 @@ run_image()
     docker_opts=""
     docker_bind="" 
 
-    name=zeroman/texlive-$(basename $cur_dir)
+    name=zeroman-texlive-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then

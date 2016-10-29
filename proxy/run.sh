@@ -39,8 +39,8 @@ run_zm_proxy()
     proxy_env $1
 
     # -it --rm 
-    docker_opts='run -it --rm --name proxy --net=host --privileged'
-    # docker_opts='run -i -d --name proxy --net=host --privileged'
+    # docker_opts='run -it --rm --name proxy --net=host --privileged'
+    docker_opts='run -i -d --name proxy --net=host --privileged'
     test -z "$http_proxy" || docker_opts+=" -e http_proxy=$http_proxy"
     test -z "$https_proxy" || docker_opts+=" -e https_proxy=$https_proxy"
     test -z "$ssh_proxy" || docker_opts+=" -e ssh_proxy=$ssh_proxy"

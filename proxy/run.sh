@@ -24,8 +24,9 @@ proxy_env()
             export https_proxy=https://proxymsn.zte.com.cn:80
             ;;
         ssh)
+            export ignore_addrs=45.79.91.227,45.79.91.226
+            export gateway="yes"
             export ssh_proxy=127.0.0.1:7070
-            export ssh_server=*:22
             ;;
         *)
             export global_proxy="yes"

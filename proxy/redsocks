@@ -116,7 +116,9 @@ stop() {
         default_iptables_rules D
         pkill -9 redsocks
     fi
-    default_route_rules D
+    if [ "$gateway" = "yes" ]; then
+        default_route_rules D
+    fi
 }
 
 interrupted () {
@@ -155,13 +157,6 @@ run() {
         if [ -n "$port" ];then
             ssh_port=$port
         fi
-        if [ -n "$ssh_server" ];then
-            ip=$(parse_ip $ssh_server)
-            port=$(parse_port $ssh_server)
-            if [ -n "$ip" -a "$ip" != '*' ];then
-                add_return_ip "$ip"
-            fi
-        fi
         echo "ssh forwarding prot is $ssh_port."
         append_redsocks_conf "socks5" $ip $ssh_port "${http_port}"
         https_port=$http_port
@@ -173,7 +168,14 @@ run() {
         default_iptables_rules A
         /usr/sbin/redsocks -c /tmp/redsocks.conf &
     fi
-    default_route_rules A
+
+    if [ -n "$ignore_addrs" ];then
+        ( IFS=,; for ip in $ignore_addrs; do add_return_ip "$ip"; done )
+    fi
+
+    if [ "$gateway" = "yes" ]; then
+        default_route_rules A
+    fi
 
     tail -f /dev/null
 }

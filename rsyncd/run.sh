@@ -43,6 +43,9 @@ case $opt in
         # rsync localhost::share 
         rsync rsync://localhost:/share 
         ;;
+    sync)
+        rsync -av rsync//$1:/share .
+        ;;
     *)
         run_image $*
         ;;

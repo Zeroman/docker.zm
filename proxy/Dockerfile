@@ -11,5 +11,5 @@ RUN pip install shadowsocks==2.8.2
 
 ADD redsocks /root/
 
-ENTRYPOINT ["/root/redsocks"]
+CMD /root/redsocks
 

@@ -64,6 +64,26 @@ run_local_proxy()
     sh ./redsocks 
 }
 
+run_shadowsocks()
+{
+    name=ss_proxy
+    SSPASSWORD=toor
+    EPMETHOD=rc4-md5
+    # EPMETHOD=aes-256-cfb
+
+    # docker_opts='run -i -d --name $name --net=host --privileged'
+    # docker_opts="run -it --rm --name $name -p 1984:1984"
+    docker_opts="run -i -d --name $name -p 1984:1984"
+    id=$(docker ps -a --filter name=$name -q)
+    if [ -n "$id" ];then
+        docker stop $name
+        docker rm $name
+    fi
+    # ss_opts="ssserver -s 0.0.0.0  -p 1984 -k $SSPASSWORD -m $EPMETHOD --fast-open -vv"
+    ss_opts="ssserver -s 0.0.0.0  -p 1984 -k $SSPASSWORD -m $EPMETHOD --fast-open"
+    docker $docker_opts zeroman/proxy $ss_opts
+}
+
 case $1 in
     fw)
         shift
@@ -86,6 +106,9 @@ case $1 in
     test)
         shift
         run_local_proxy $@
+        ;;
+    ss|shadowsocks)
+        run_shadowsocks
         ;;
     *)
         run_zm_proxy $@

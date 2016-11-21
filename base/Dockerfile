@@ -16,7 +16,8 @@ RUN apt-get install -y --no-install-recommends \
         locales sqlite ca-certificates openssl python-pip
 
 # RUN apt-get install -y --no-install-recommends \
-        
+
+RUN pip install supervisor
 
 
 ARG UID=1000
@@ -29,3 +30,5 @@ RUN mkdir -p /home/developer && \
     chmod 0440 /etc/sudoers.d/developer && \
     chown ${UID}:${GID} -R /home/developer
 
+
+CMD ["supervisord"]

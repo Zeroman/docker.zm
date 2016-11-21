@@ -14,6 +14,10 @@ run_image()
         docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
     fi
 
+    if [ -e $cur_dir/supervisord.conf ];then
+        docker_bind+="-v $cur_dir/supervisord.conf:/etc/supervisord.conf"
+    fi
+
     name=zeroman.base-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
@@ -46,7 +50,7 @@ case $opt in
         docker rmi zeroman/base
         ;;
     *)
-        run_image $*
+        run_image bash
         ;;
 esac
 

@@ -15,7 +15,7 @@ run_image()
     fi
 
     if [ -e $cur_dir/supervisord.conf ];then
-        docker_bind+="-v $cur_dir/supervisord.conf:/etc/supervisord.conf"
+        docker_bind+=" -v $cur_dir/supervisord.conf:/etc/supervisord.conf"
     fi
 
     name=zeroman.base-$(basename $cur_dir)

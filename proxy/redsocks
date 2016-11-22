@@ -2,7 +2,7 @@
 
 http_port=12345
 https_port=12346
-ssh_port=7070
+socks_port=12347
 
 index=0
 declare -a return_ips
@@ -26,9 +26,17 @@ proc_common_rules()
 {
     iptable_common=$*
 
-    for ip in ${return_ips[*]}
+    for info in ${return_ips[*]}
     do
-        $iptable_common -j RETURN -d $ip 
+        ip=$(parse_ip $info)
+        port=$(parse_port $info)
+        if [ -z "$port" -o "$ip" = "$port" ];then
+            echo "$iptable_common return $ip all port"
+            $iptable_common -j RETURN -d $ip 
+        else
+            echo "$iptable_common return $ip:$port"
+            $iptable_common -p tcp --dport $port -d $ip -j RETURN
+        fi
     done
 
     if [ -n "$http_proxy" ]; then
@@ -37,8 +45,8 @@ proc_common_rules()
     if [ -n "$http_proxy" ]; then
         $iptable_common -p tcp -j REDIRECT --dport 443 --to-ports ${https_port} 
     fi
-    if [ -n "$ssh_proxy" ]; then
-        $iptable_common -p tcp -j REDIRECT --to-ports ${http_port}
+    if [ -n "$socks_proxy" ]; then
+        $iptable_common -p tcp -j REDIRECT --to-ports ${socks_port}
     fi
 }
 
@@ -101,21 +109,31 @@ EOF
 }
 
 parse_ip() {
-  echo $1 | sed -nE "s/^(http(s)?:\/\/)?(.+):([0-9]+)\/?$/\3/p"
+    info=$1
+    if [ "${info::4}" = "http" ];then
+        echo $info | sed -nE "s/^(http(s)?:\/\/)?(.+):([0-9]+)\/?$/\3/p"
+    else
+        echo ${info%:*}
+    fi
 }
 
 parse_port() {
-  echo $1 | sed -nE "s/^(http(s)?:\/\/)?(.+):([0-9]+)\/?$/\4/p"
+    info=$1
+    if [ "${info::4}" = "http" ];then
+        echo $info | sed -nE "s/^(http(s)?:\/\/)?(.+):([0-9]+)\/?$/\4/p"
+    else
+        echo ${info/*:}
+    fi
 }
 
 stop() {
     echo "Cleaning iptables"
-    if [ -z "$global_proxy" ]; then
-        prerouting_iptables_rules D docker0
-        prerouting_iptables_rules D ${default_iface}
-        default_iptables_rules D
-        pkill -9 redsocks
+    if [ -n "$docker_iface" ];then
+        prerouting_iptables_rules D "$docker_iface"
     fi
+    prerouting_iptables_rules D ${default_iface}
+    default_iptables_rules D
+    pkill -9 redsocks
     if [ "$gateway" = "yes" ]; then
         default_route_rules D
     fi
@@ -128,17 +146,25 @@ interrupted () {
     kill -INT $$
 }
 
+terminated () {
+    echo 'Terminated, cleaning up...'
+    trap - TERM
+    stop
+    kill -TERM $$
+}
+
 run() {
     trap interrupted INT
-    # trap terminated TERM QUIT
-    trap terminated 15
+    trap terminated TERM QUIT
 
     make_redsocks_conf_head
 
     if [ -n "$http_proxy" ]; then
         ip=$(parse_ip $http_proxy)
         port=$(parse_port $http_proxy)
-        append_redsocks_conf "http-relay" $ip $port "${http_port}"
+        if [ -n "$ip" -a -n "$port" ];then
+            append_redsocks_conf "http-relay" $ip $port "${http_port}"
+        fi
 
         if [ -z "$https_proxy" ]; then
             https_proxy="$http_proxy"
@@ -148,45 +174,43 @@ run() {
     if [ -n "$https_proxy" ]; then
         ip=$(parse_ip $https_proxy)
         port=$(parse_port $https_proxy)
-        append_redsocks_conf "http-connect" $ip $port "${https_port}"
-    fi
-
-    if [ -n "$ssh_proxy" ]; then
-        ip=$(parse_ip $ssh_proxy)
-        port=$(parse_port $ssh_proxy)
-        if [ -n "$port" ];then
-            ssh_port=$port
+        if [ -n "$ip" -a -n "$port" ];then
+            append_redsocks_conf "http-connect" $ip $port "${https_port}"
         fi
-        echo "ssh forwarding prot is $ssh_port."
-        append_redsocks_conf "socks5" $ip $ssh_port "${http_port}"
-        https_port=$http_port
     fi
 
-    if [ -z "$global_proxy" ]; then
-        prerouting_iptables_rules A docker0
-        prerouting_iptables_rules A ${default_iface}
-        default_iptables_rules A
-        /usr/sbin/redsocks -c /tmp/redsocks.conf &
+    if [ -n "$socks_proxy" ]; then
+        ip=$(parse_ip $socks_proxy)
+        port=$(parse_port $socks_proxy)
+        if [ -n "$ip" -a -n "$port" ];then
+            echo "socks forwarding prot is $port."
+            add_return_ip $socks_proxy
+            append_redsocks_conf "socks5" $ip $port "${socks_port}"
+        fi
     fi
 
     if [ -n "$ignore_addrs" ];then
-        ( IFS=,; for ip in $ignore_addrs; do add_return_ip "$ip"; done )
+        for ip in $(echo $ignore_addrs | tr , ' ')
+        do 
+            # echo "ignore addrs $ip"
+            add_return_ip "$ip"
+        done
     fi
+
+    if [ -n "$docker_iface" ];then
+        prerouting_iptables_rules A "$docker_iface"
+    fi
+    prerouting_iptables_rules A ${default_iface}
+    default_iptables_rules A
+    /usr/sbin/redsocks -c /tmp/redsocks.conf &
 
     if [ "$gateway" = "yes" ]; then
         default_route_rules A
     fi
 
-    tail -f /dev/null
+    wait
 }
 
-
-terminated () {
-    echo 'Terminated, cleaning up...'
-    trap - TERM
-    stop
-    kill -TERM $$
-}
 
 case "$1" in
     stop )  stop ;;

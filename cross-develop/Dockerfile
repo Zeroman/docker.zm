@@ -9,3 +9,5 @@ RUN apt-get install -y --no-install-recommends \
 ADD cross_dev.sh /bin/cross_dev.sh
 
 ENTRYPOINT ["/bin/cross_dev.sh"]
+
+CMD ['']

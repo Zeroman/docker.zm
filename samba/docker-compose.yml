@@ -7,7 +7,8 @@ services:
     volumes:
     - /tmp/.samba:/temp
     - /work/temp:/share
+    - /work/win.iso:/iso
     ports:
     - "139:139"
     - "445:445"
-    command: -s "temp;/temp;yes;no;yes" -s "share;/share"
+    command: -s "temp;/temp;yes;no;yes" -s "share;/share" -s "iso;/iso"

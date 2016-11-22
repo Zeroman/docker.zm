@@ -10,7 +10,7 @@ case $1 in
     shell)
         docker exec -it samba bash
         ;;
-    *)
+    test)
         docker run -it --name samba -p 139:139 -p 445:445 -v /tmp/.samba:/temp -d dperson/samba \
             -u "abc;abcd" \
             -u "e1;e11" \
@@ -21,5 +21,11 @@ case $1 in
             -s "example1 private;/example1;no;no;no;e1" \
             -s "example2 private;/example2;no;no;no;e2"
 
+        ;;
+    -h|help)
+        docker run -it --rm dperson/samba -h
+        ;;
+    *)
+        docker-compose up -d
         ;;
 esac

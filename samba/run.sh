@@ -26,6 +26,7 @@ case $1 in
         docker run -it --rm dperson/samba -h
         ;;
     *)
+        mkdir -p -m 0777 /tmp/.samba
         docker-compose up -d
         ;;
 esac

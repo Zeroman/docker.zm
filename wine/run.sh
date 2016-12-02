@@ -13,7 +13,7 @@ run_image()
 
     name=wine-$(basename $cur_dir)
 
-    docker_bind+="-v $PWD/.wine:/root/.wine" 
+    docker_bind+="-v $cur_dir/.wine:/home/developer/.wine" 
 
     hostdev=true
     if $hostdev;then
@@ -43,14 +43,15 @@ run_image()
 
 wine_zhcn_font()
 {
-    WINE=wine-development
+    # WINE=wine-development
+    WINE=wine
     fonts_dir=$cur_dir/.wine/drive_c/windows/Fonts
     system_reg=$cur_dir/.wine/system.reg
     font_path=$cur_workdir/simsun.ttc
     font_reg=$cur_workdir/zhcn_font.reg
     if [ -d $fonts_dir -a -e $font_path -a -e $font_reg ];then
         # sudo cp -fv  $font_path $fonts_dir/
-        sudo cp -fv *.ttf *.ttc $fonts_dir/
+        sudo cp -fv $cur_workdir/*.ttf $cur_workdir/*.ttc $fonts_dir/
         sed -i 's/LogPixels"=dword:00000060/LogPixels"=dword:00000070/g'    $system_reg
         sed -i 's/MS Shell Dlg"="Tahoma/MS Shell Dlg"="SimSun/g'            $system_reg
         sed -i 's/MS Shell Dlg 2"="Tahoma/MS Shell Dlg 2"="SimSun/g'        $system_reg

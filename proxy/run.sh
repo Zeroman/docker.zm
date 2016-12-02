@@ -13,24 +13,12 @@ proxy_env()
 
     case $1 in
         eg1)
-            export http_proxy=http://proxynj.eg.com:80
-            export https_proxy=https://proxynj.eg.com:80
+            export http_proxy=http://proxy.eg.com:80
+            export https_proxy=https://proxy.eg.com:80
             ;;
         eg2)
             export http_proxy=http://proxy2.eg.com:80
             export https_proxy=https://proxy2.eg.com:80
-            ;;
-        nj)
-            export http_proxy=http://proxynj.zte.com.cn:80
-            export https_proxy=https://proxynj.zte.com.cn:80
-            ;;
-        sz)
-            export http_proxy=http://proxysz.zte.com.cn:80
-            export https_proxy=https://proxysz.zte.com.cn:80
-            ;;
-        msn)
-            export http_proxy=http://proxymsn.zte.com.cn:80
-            export https_proxy=https://proxymsn.zte.com.cn:80
             ;;
         socks)
             export gateway="yes"
@@ -44,12 +32,9 @@ proxy_env()
 
 run_zm_proxy()
 {
-    proxy_env $1
-
     docker_opts=""
     docker_bind="" 
 
-    # -it --rm 
     # docker_opts+='run -it --rm --name proxy --net=host --privileged'
     docker_opts='run -i -d --name proxy --net=host --privileged'
     test -z "$http_proxy" || docker_opts+=" -e http_proxy=$http_proxy"
@@ -70,16 +55,6 @@ run_zm_proxy()
     docker $docker_opts $docker_bind zeroman/proxy
 }
 
-
-run_local_proxy()
-{ 
-    if [ $UID != 0 ];then
-        echo "Please use sudo or root."
-        exit 1
-    fi
-    proxy_env $1
-    sh ./redsocks 
-}
 
 run_shadowsocks()
 {
@@ -131,8 +106,6 @@ case $1 in
         run_zm_proxy socks
         ;;
     test)
-        shift
-        run_local_proxy $@
         ;;
     ss|shadowsocks)
         run_shadowsocks

@@ -33,6 +33,7 @@ RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
 ENV LANG zh_CN.UTF-8  
 ENV LANGUAGE zh_CN:zh  
 ENV LC_ALL zh_CN.UTF-8 
+ENV WINEARCH win32
 
 # cp wine_gecko-2.47-x86.msi /root/.cache/wine/
 # wineboot -u

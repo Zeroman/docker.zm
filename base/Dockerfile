@@ -15,10 +15,12 @@ RUN apt-get install -y --no-install-recommends \
         patch wget cpio rsync net-tools automake autoconf curl \
         locales sqlite ca-certificates openssl python-pip
 
-# RUN apt-get install -y --no-install-recommends \
-
 RUN pip install supervisor
 
+RUN apt-get install -y --no-install-recommends \
+        distcc apt-file
+
+RUN apt-file update
 
 ARG UID=1000
 ARG GID=1000

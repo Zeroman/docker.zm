@@ -18,7 +18,7 @@ run_image()
         docker_bind+=" -v $cur_dir/supervisord.conf:/etc/supervisord.conf"
     fi
 
-    name=zeroman.base-$(basename $cur_dir)
+    name=base-$(basename $cur_dir)-$1
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -48,6 +48,9 @@ case $opt in
     c|clean)
         docker rm zeroman/base
         docker rmi zeroman/base
+        ;;
+    distcc)
+        run_image distccd --daemon --no-detach --allow 0.0.0.0
         ;;
     *)
         run_image bash

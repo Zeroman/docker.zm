@@ -16,6 +16,8 @@ RUN echo "deb http://dl.winehq.org/wine-builds/debian/ jessie main" > /etc/apt/s
 RUN apt-get update 
 RUN apt-get install -y winehq-devel
 
+# RUN apt-get install -y --no-install-recommends winetricks zenity
+
 # wine32-development-tools x11-apps:i386
 
 # Use the latest version of winetricks 

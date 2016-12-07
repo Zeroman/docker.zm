@@ -21,8 +21,10 @@ run_image()
     fi
 
     if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:/root/.bashrc:ro"
+        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
     fi
+
+    mkdir -p .wine
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -35,7 +37,7 @@ run_image()
             -v $cur_dir:/work \
             -e UID=$UID \
             -w /work \
-            zeroman/wine $@
+            zeroman/wine bash
     else
         docker start -i $name
     fi

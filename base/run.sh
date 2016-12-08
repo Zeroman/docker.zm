@@ -34,13 +34,13 @@ run_image()
 
 start_distcc_server()
 {
-    name=distccd
+    name=distcc_server
     id=$(docker ps -a --filter name=$name -q)
     if [ -n "$id" ];then
         docker kill $name
         docker rm $name
     fi
-    docker run -i -d --name distccd --net=host zeroman/base \
+    docker run -it -d --name $name --net=host zeroman/base \
         distccd --daemon --user nobody --no-detach --allow 0.0.0.0/0
 
 }

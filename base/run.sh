@@ -50,7 +50,8 @@ case $opt in
         docker rmi zeroman/base
         ;;
     distcc)
-        run_image distccd --daemon --no-detach --allow 0.0.0.0
+        cmd="distccd --daemon --no-detach --allow 0.0.0.0/0"
+        docker run -it --rm --name distccd --net=host zeroman/base $cmd 
         ;;
     *)
         run_image bash

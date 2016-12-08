@@ -31,6 +31,18 @@ run_image()
         docker start -it $name
     fi
 }
+
+start_distcc_server()
+{
+    name=distccd
+    id=$(docker ps -a --filter name=$name -q)
+    if [ -n "$id" ];then
+        docker kill $name
+        docker rm $name
+    fi
+    cmd="distccd --daemon --no-detach --allow 0.0.0.0/0"
+    docker run -i -d --name distccd --net=host zeroman/base $cmd 
+}
  
 
 opt=$1
@@ -50,8 +62,12 @@ case $opt in
         docker rmi zeroman/base
         ;;
     distcc)
-        cmd="distccd --daemon --no-detach --allow 0.0.0.0/0"
-        docker run -it --rm --name distccd --net=host zeroman/base $cmd 
+        start_distcc_server
+        ;;
+    sd|stop_distcc)
+        name=distccd
+        docker kill $name
+        docker rm $name
         ;;
     *)
         run_image bash

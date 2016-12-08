@@ -33,7 +33,7 @@ RUN mkdir -p /home/developer && \
     chmod 0440 /etc/sudoers.d/developer && \
     chown ${UID}:${GID} -R /home/developer
 
-# RUN apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends distcc-pump
 
 
 CMD ["supervisord"]

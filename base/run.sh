@@ -40,8 +40,9 @@ start_distcc_server()
         docker kill $name
         docker rm $name
     fi
-    cmd="distccd --daemon --no-detach --allow 0.0.0.0/0"
-    docker run -i -d --name distccd --net=host zeroman/base $cmd 
+    docker run -i -d --name distccd --net=host zeroman/base \
+        distccd --daemon --user nobody --no-detach --allow 0.0.0.0/0
+
 }
  
 

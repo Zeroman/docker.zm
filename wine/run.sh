@@ -6,6 +6,8 @@ cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
 
+wine_home=/home/developer
+
 run_image()
 {
     docker_opts=""
@@ -13,18 +15,27 @@ run_image()
 
     name=wine-$(basename $cur_dir)
 
-    docker_bind+="-v $cur_dir/.wine:/home/developer/.wine" 
-
     hostdev=true
     if $hostdev;then
         docker_opts+=" --privileged"
     fi
 
     if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
+        docker_bind+=" -v $HOME/.bashrc:$wine_home/.bashrc:ro"
     fi
 
-    mkdir -p .wine
+    if [ ! -d $cur_workdir/cache ];then
+        mkdir -p $cur_workdir/cache 
+    fi
+    docker_bind+=" -v $cur_workdir/cache:$wine_home/.cache/wine"
+
+    mkdir -p $cur_dir/.wine
+    docker_bind+=" -v $cur_dir/.wine:$wine_home/.wine"
+
+    cmd="/opt/wine/run.sh setup"
+    if [ "$#" != 0 ];then
+        cmd=$@
+    fi
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -34,13 +45,23 @@ run_image()
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
-            -v $cur_dir:/work \
-            -e UID=$UID \
-            -w /work \
-            zeroman/wine bash
+            -v $cur_dir:/work -w /work \
+            -e UID=$UID -v $cur_workdir/run.sh:/opt/wine/run.sh \
+            zeroman/wine $cmd
     else
         docker start -i $name
     fi
+}
+
+wine_setup()
+{
+    if [ ! ~/.wine ];then
+        wineboot -u
+        winetricks mfc42 #odbc32
+    fi
+    # wine explorer /desktop=DockerDesktop,1024x768
+    wine explorer 
+    bash
 }
 
 wine_zhcn_font()
@@ -49,11 +70,11 @@ wine_zhcn_font()
     WINE=wine
     fonts_dir=$cur_dir/.wine/drive_c/windows/Fonts
     system_reg=$cur_dir/.wine/system.reg
-    font_path=$cur_workdir/simsun.ttc
+    font_path=$cur_workdir/font/simsun.ttc
     font_reg=$cur_workdir/zhcn_font.reg
     if [ -d $fonts_dir -a -e $font_path -a -e $font_reg ];then
         # sudo cp -fv  $font_path $fonts_dir/
-        sudo cp -fv $cur_workdir/*.ttf $cur_workdir/*.ttc $fonts_dir/
+        sudo cp -fv $cur_workdir/font/*.ttf $cur_workdir/font/*.ttc $fonts_dir/
         sed -i 's/LogPixels"=dword:00000060/LogPixels"=dword:00000070/g'    $system_reg
         sed -i 's/MS Shell Dlg"="Tahoma/MS Shell Dlg"="SimSun/g'            $system_reg
         sed -i 's/MS Shell Dlg 2"="Tahoma/MS Shell Dlg 2"="SimSun/g'        $system_reg
@@ -83,6 +104,9 @@ case $opt in
         ;;
     cn|chinese_font)
         wine_zhcn_font
+        ;;
+    setup)
+        wine_setup
         ;;
     *)
         run_image $*

@@ -1,6 +1,15 @@
 FROM zeroman/base
 
-RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
+RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
+
+RUN echo "deb http://dl.winehq.org/wine-builds/debian/ jessie main" > /etc/apt/sources.list.d/wine.list
+RUN apt-get update 
+RUN apt-get install -y winehq-devel winetricks playonlinux ttf-mscorefonts-installer 
+ADD lang.sh /etc/profile.d/
+RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
+USER developer
+
+# RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # echo '\nLANG="zh_CN.GB2312"\nLANGUAGE="zh_CN:zh"' > /etc/default/locale 
 # RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
@@ -9,12 +18,6 @@ RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # ENV LC_ALL zh_CN.GB2312 
 
 # RUN apt-get install -y --no-install-recommends wine-development wine32-development wine32-development-preloader fonts-wine
-
-RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
-
-RUN echo "deb http://dl.winehq.org/wine-builds/debian/ jessie main" > /etc/apt/sources.list.d/wine.list
-RUN apt-get update 
-RUN apt-get install -y winehq-devel
 
 # RUN apt-get install -y --no-install-recommends winetricks zenity
 
@@ -31,13 +34,11 @@ RUN apt-get install -y winehq-devel
 # RUN echo "alias winegui='wine explorer /desktop=DockerDesktop,1024x768'" > ~/.bash_aliases 
 # RUN echo "alias wi='LANG=zh_CN.GB2312 LC_ALL=zh_CN.GB2312 LANGUAGE=zh_CN:zh wine'" > ~/.bash_aliases 
 
-RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
-ENV LANG zh_CN.UTF-8  
-ENV LANGUAGE zh_CN:zh  
-ENV LC_ALL zh_CN.UTF-8 
-ENV WINEARCH win32
+# ENV LANG zh_CN.UTF-8  
+# ENV LANGUAGE zh_CN:zh  
+# ENV LC_ALL zh_CN.UTF-8 
+# ENV WINEARCH win32
 
 # cp wine_gecko-2.47-x86.msi /root/.cache/wine/
 # wineboot -u
 
-USER developer

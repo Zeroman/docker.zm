@@ -103,6 +103,8 @@ case $1 in
         ssh -N -D $socks_inport 127 -v
         ;;
     mxb)
+        # export socks_proxy=127.0.0.1:1080
+        export socks_proxy=127.0.0.1:7070
         run_zm_proxy socks
         ;;
     test)

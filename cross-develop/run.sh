@@ -120,7 +120,7 @@ case $opt in
         rmdir nfs
         rmdir tftp
         docker rm zeroman/cross_develop
-        docker rmi zeroman/cross_develop
+        # docker rmi zeroman/cross_develop
         ;;
     *)
         run_image $opt $*

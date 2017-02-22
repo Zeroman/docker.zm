@@ -1,8 +1,8 @@
-version: '2'
+version: "2"
 
 services:
   samba:
-    restart: always
+    restart: "no"
     image: dperson/samba
     volumes:
     - /tmp/.samba:/temp

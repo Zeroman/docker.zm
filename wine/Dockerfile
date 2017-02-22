@@ -4,10 +4,15 @@ RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
 
 RUN echo "deb http://dl.winehq.org/wine-builds/debian/ jessie main" > /etc/apt/sources.list.d/wine.list
 RUN apt-get update 
-RUN apt-get install -y winehq-devel winetricks playonlinux ttf-mscorefonts-installer 
+RUN apt-get install -y wine-devel winetricks ttf-mscorefonts-installer 
+
+RUN apt-get install -y winehq-devel
+
 ADD lang.sh /etc/profile.d/
 RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
 USER developer
+
+# RUN apt-get install -y # playonlinux
 
 # RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales

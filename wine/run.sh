@@ -25,9 +25,10 @@ run_image()
     fi
 
     if [ ! -d $cur_workdir/cache ];then
-        mkdir -p $cur_workdir/cache 
+        mkdir -p $cur_workdir/cache/wine 
+        mkdir -p $cur_workdir/cache/winetricks
     fi
-    docker_bind+=" -v $cur_workdir/cache:$wine_home/.cache/wine"
+    docker_bind+=" -v $cur_workdir/cache:$wine_home/.cache"
 
     mkdir -p $cur_dir/.wine
     docker_bind+=" -v $cur_dir/.wine:$wine_home/.wine"
@@ -55,12 +56,20 @@ run_image()
 
 wine_setup()
 {
+    export LANG=zh_CN.UTF-8  
+    export LANGUAGE=zh_CN:zh  
+    export LC_ALL=zh_CN.UTF-8 
+    export WINEARCH=win32
+
     if [ ! ~/.wine ];then
+        # winetricks mfc42 #odbc32
+        winetricks vcrun6 vcrun6sp6
+        winetricks vcrun2005 vcrun2008 vcrun2010 vcrun2012 vcrun2013
+
         wineboot -u
-        winetricks mfc42 #odbc32
     fi
     # wine explorer /desktop=DockerDesktop,1024x768
-    wine explorer 
+    wine explorer Z:\\work
     bash
 }
 
@@ -75,11 +84,11 @@ wine_zhcn_font()
     if [ -d $fonts_dir -a -e $font_path -a -e $font_reg ];then
         # sudo cp -fv  $font_path $fonts_dir/
         sudo cp -fv $cur_workdir/font/*.ttf $cur_workdir/font/*.ttc $fonts_dir/
-        sed -i 's/LogPixels"=dword:00000060/LogPixels"=dword:00000070/g'    $system_reg
-        sed -i 's/MS Shell Dlg"="Tahoma/MS Shell Dlg"="SimSun/g'            $system_reg
-        sed -i 's/MS Shell Dlg 2"="Tahoma/MS Shell Dlg 2"="SimSun/g'        $system_reg
+        # sed -i 's/LogPixels"=dword:00000060/LogPixels"=dword:00000070/g'    $system_reg
+        # sed -i 's/MS Shell Dlg"="Tahoma/MS Shell Dlg"="SimSun/g'            $system_reg
+        # sed -i 's/MS Shell Dlg 2"="Tahoma/MS Shell Dlg 2"="SimSun/g'        $system_reg
         sudo cp -fv $font_reg $cur_dir/.wine/drive_c/
-        run_image $WINE regedit /s c:\\zhcn_font.reg
+        # run_image $WINE regedit /s c:\\zhcn_font.reg
     fi
 }
 

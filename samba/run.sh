@@ -29,7 +29,7 @@ case $1 in
         samba_dir=/tmp/.samba
         mkdir -p -m 0777 $samba_dir
         sudo chown $USER.$USER $samba_dir
-        sudo chmod 755 $samba_dir
+        sudo chmod 777 $samba_dir
         docker-compose up -d
         ;;
 esac

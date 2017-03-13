@@ -147,6 +147,9 @@ start_bridge()
         fi
         sudo ip addr del $ipaddr dev $iface
     fi
+
+    #configure iptables to allow all traffic to be forwarded across the bridge by adding a rule like this:
+    sudo iptables -I FORWARD -m physdev --physdev-is-bridged -j ACCEPT
 }
 
 stop_bridge()

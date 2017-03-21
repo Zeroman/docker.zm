@@ -8,7 +8,7 @@ RUN apt-get install -y --no-install-recommends \
 
 # for build android system
 RUN apt-get install -y --no-install-recommends \
-        squashfs-tools gettext python-mako genisoimage
+        squashfs-tools gettext python-mako genisoimage usbutils
 # libgl1-mesa-dev 
 
 RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java

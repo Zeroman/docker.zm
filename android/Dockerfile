@@ -11,7 +11,7 @@ RUN apt-get install -y --no-install-recommends \
         squashfs-tools gettext python-mako genisoimage
 # libgl1-mesa-dev 
 
-RUN update-alternatives --set java /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
 RUN echo "kvm:x:78:developer" >> /etc/group
 

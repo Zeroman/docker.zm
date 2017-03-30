@@ -6,7 +6,7 @@ ADD sources.list /etc/apt/sources.list
 
 RUN dpkg --add-architecture i386 && apt-get update
 
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends -t jessie-backports \
         locales sqlite ca-certificates openssl apt-file lsof \
         sudo less tree file cpio patch wget curl rsync net-tools expect \
         xz-utils bzip2 zip unzip lzop p7zip p7zip-rar lzma lzop \
@@ -33,7 +33,7 @@ RUN mkdir -p /home/developer && \
     chmod 0440 /etc/sudoers.d/developer && \
     chown ${UID}:${GID} -R /home/developer
 
-RUN apt-get install -y --no-install-recommends distcc-pump
+RUN apt-get install -y --no-install-recommends -t jessie-backports distcc-pump
 
 
 CMD ["supervisord"]

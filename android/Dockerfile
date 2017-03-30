@@ -1,14 +1,13 @@
 FROM zeroman/java
 
 # for build android application
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends -t jessie-backports \
         zlib1g:i386 abootimg aapt android-tools-adb \
         android-tools-fsutils android-tools-fastboot \
-        pciutils mesa-utils
+        pciutils mesa-utils squashfs-tools gettext python-mako genisoimage usbutils
 
 # for build android system
-RUN apt-get install -y --no-install-recommends \
-        squashfs-tools gettext python-mako genisoimage usbutils
+# RUN apt-get install -y --no-install-recommends \
 # libgl1-mesa-dev 
 
 RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java

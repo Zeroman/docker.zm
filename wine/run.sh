@@ -28,7 +28,7 @@ run_image()
         mkdir -p $cur_workdir/cache/wine 
         mkdir -p $cur_workdir/cache/winetricks
     fi
-    docker_bind+=" -v $cur_workdir/cache:$wine_home/.cache"
+    docker_bind+=" -v $cur_workdir/cache/wine:$wine_home/.cache/wine"
 
     mkdir -p $cur_dir/.wine
     docker_bind+=" -v $cur_dir/.wine:$wine_home/.wine"

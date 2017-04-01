@@ -25,7 +25,7 @@ run_image()
     fi
 
     if [ -d /dev/snd ];then
-        docker_bind+=" -v /dev/snd:/dev/snd"
+        docker_opts+=" --device /dev/snd"
     fi
 
     if [ ! -d $cur_workdir/cache ];then

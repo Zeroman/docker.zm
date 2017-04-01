@@ -7,7 +7,8 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends -t jessie-backports \
         wine-devel winehq-devel winetricks ttf-mscorefonts-installer 
 
-# RUN apt-get install -y 
+RUN apt-get install -y --no-install-recommends -t jessie-backports \
+        libgl1-mesa-dri:i386
 
 ADD lang.sh /etc/profile.d/
 RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales

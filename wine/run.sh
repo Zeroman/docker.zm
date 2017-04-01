@@ -24,6 +24,10 @@ run_image()
         docker_bind+=" -v $HOME/.bashrc:$wine_home/.bashrc:ro"
     fi
 
+    if [ -d /dev/snd ];then
+        docker_bind+=" -v /dev/snd:/dev/snd"
+    fi
+
     if [ ! -d $cur_workdir/cache ];then
         mkdir -p $cur_workdir/cache/wine 
         mkdir -p $cur_workdir/cache/winetricks

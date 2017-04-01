@@ -6,7 +6,8 @@ cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
 
-wine_home=/home/developer
+# wine_home=/home/developer
+wine_home=/root
 
 run_image()
 {
@@ -15,7 +16,7 @@ run_image()
 
     name=wine-$(basename $cur_dir)
 
-    hostdev=true
+    hostdev=false
     if $hostdev;then
         docker_opts+=" --privileged"
     fi
@@ -25,7 +26,10 @@ run_image()
     fi
 
     if [ -d /dev/snd ];then
-        docker_opts+=" --device /dev/snd"
+        # docker_opts+=" --group-add audio"
+        docker_bind+=" --device /dev/snd"
+        docker_bind+=" -v /run/dbus/:/run/dbus/"
+        docker_bind+=" -v /dev/shm:/dev/shm"
     fi
 
     if [ ! -d $cur_workdir/cache ];then
@@ -34,7 +38,7 @@ run_image()
     fi
     docker_bind+=" -v $cur_workdir/cache/wine:$wine_home/.cache/wine"
 
-    mkdir -p $cur_dir/.wine
+    # mkdir -p $cur_dir/.wine
     docker_bind+=" -v $cur_dir/.wine:$wine_home/.wine"
 
     cmd="/opt/wine/run.sh setup"

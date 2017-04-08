@@ -7,7 +7,7 @@ cur_file_dir=${cur_file_path%/*}
 share_sets=""
 iso_sets=""
 disk_sets=""
-console_sets=""
+monitor_sets=""
 bios_sets=""
 floppy_img=""
 sys_img=""
@@ -49,6 +49,7 @@ defalutConfig()
     spiceTitle="spice"
     clientSSHPort=""
     consolePort=""
+    monitorPath=""
     macaddr=""
     memSize=1536
     # usbIDs="1782:4d00 1782:3d00"
@@ -237,6 +238,7 @@ usage()
     --spice-port $spicePort
     --spice-title $spiceTitle
     --console-port $consolePort
+    --monitor-path $monitorPath
     --macaddr $macaddr
     --mem-size $memSize
     --usb-ids $usbIDs
@@ -283,6 +285,8 @@ kvmConfig()
             --client-ssh-port) shift; clientSSHPort=$1; shift;
                 ;;
             --console-port) shift; consolePort=$1; shift;
+                ;;
+            --monitor-path) shift; monitorPath=$1; shift;
                 ;;
             --macaddr) shift; macaddr=$1; shift;
                 ;;
@@ -464,7 +468,11 @@ initConfig()
     esac
 
     if [ -n "$consolePort" ];then
-        console_sets="-monitor telnet::$consolePort,server,nowait"
+        monitor_sets+=" -monitor telnet::$consolePort,server,nowait"
+    fi
+    if [ -n "$monitorPath" ];then
+        monitor_sets+=" -monitor unix:$monitorPath,server,nowait"
+        #nc -v -U $monitorpath
     fi
     if [ -n "$clientSSHPort" ];then
         net_sets+=" -redir tcp:$clientSSHPort::22"
@@ -519,7 +527,7 @@ initConfig()
         fi
     fi
 
-    common_sets=$(echo $base_sets $console_sets $net_sets $usb_sets $share_sets $disk_sets $iso_sets $bios_sets $other_args)
+    common_sets=$(echo $base_sets $monitor_sets $net_sets $usb_sets $share_sets $disk_sets $iso_sets $bios_sets $other_args)
     echo "--------------------------------------"
     echo $common_sets
     echo "--------------------------------------"

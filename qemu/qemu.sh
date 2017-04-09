@@ -44,6 +44,7 @@ check_udev()
 
 defalutConfig()
 {
+    qemuName=""
     vncPort=3389
     spicePort=5900
     spiceTitle="spice"
@@ -276,6 +277,8 @@ kvmConfig()
     argv=""
     while [ $# -gt 0 ]; do
         case $1 in
+            --name) shift; qemuName=$1; shift;
+                ;;
             --vnc-port) shift; vncPort=$1; shift;
                 ;;
             --spice-port) shift; spicePort=$1; shift;
@@ -437,9 +440,12 @@ initConfig()
     test -e "$work_img" && disk_sets+=" -drive file=${work_img},if=$work_disk_type,cache=writeback"
     test -e "$floppy_img" && disk_sets+=" -fda ${floppy_img}"
     # -cpu kvm64 -M pc 
-    base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm"
+    base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm -nodefaults -balloon virtio"
     if $daemonize;then
         base_sets+=" --daemonize"
+    fi
+    if [ -n "$qemuName" ];then
+        base_sets+=" -name $qemuName"
     fi
 
     if [ -z "$macaddr" ];then
@@ -473,6 +479,8 @@ initConfig()
     if [ -n "$monitorPath" ];then
         monitor_sets+=" -monitor unix:$monitorPath,server,nowait"
         #nc -v -U $monitorpath
+        # monitor_sets+=" -chardev socket,id=charmonitor,path=$monitorPath,server,nowait"
+        # monitor_sets+=" -mon chardev=charmonitor,id=monitor,mode=control"
     fi
     if [ -n "$clientSSHPort" ];then
         net_sets+=" -redir tcp:$clientSSHPort::22"
@@ -561,7 +569,8 @@ kvmExcute()
             ;;
         --spice)
             shift
-	    echo $spice_sets
+            echo $spice_sets
+            echo $QEMU $common_sets $spice_sets $@ > /tmp/qemu.args
             $QEMU $common_sets $spice_sets $@
             # sleep 3
             # $spice_client -f -h 127.0.0.1 -p $spicePort --title "$spiceTitle"

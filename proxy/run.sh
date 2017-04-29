@@ -103,9 +103,12 @@ case $1 in
         ssh -N -D $socks_inport 127 -v
         ;;
     mxb)
-        # export socks_proxy=127.0.0.1:1080
-        export socks_proxy=127.0.0.1:7070
         run_zm_proxy socks
+        SS_PASSWORD='mXb902!'
+        SS_ENCRPY="aes-256-cfb"
+        SS_PORT=995
+        SS_HOST=45.79.91.227
+        ./shadowsocks-libev/src/ss-local -v -s $SS_HOST -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
         ;;
     test)
         ;;

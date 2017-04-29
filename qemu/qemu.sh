@@ -500,6 +500,7 @@ initConfig()
     fi
 
     spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
+    # spice_sets="-device virtio-gpu,virgl=on -spice gl=on,port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
     # for agent copy and paste
     spice_sets+=" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
     spice_sets+=" -device virtserialport,chardev=vdagent,name=com.redhat.spice.0"

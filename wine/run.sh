@@ -16,7 +16,7 @@ run_image()
 
     name=wine-$(basename $cur_dir)
 
-    hostdev=false
+    hostdev=true
     if $hostdev;then
         docker_opts+=" --privileged"
     fi

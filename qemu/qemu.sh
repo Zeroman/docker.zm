@@ -50,6 +50,7 @@ defalutConfig()
     spiceTitle="spice"
     clientSSHPort=""
     consolePort=""
+    qmpPort=""
     monitorPath=""
     macaddr=""
     memSize=1536
@@ -239,6 +240,7 @@ usage()
     --spice-port $spicePort
     --spice-title $spiceTitle
     --console-port $consolePort
+    --qmp-port $qmpPort
     --monitor-path $monitorPath
     --macaddr $macaddr
     --mem-size $memSize
@@ -288,6 +290,8 @@ kvmConfig()
             --client-ssh-port) shift; clientSSHPort=$1; shift;
                 ;;
             --console-port) shift; consolePort=$1; shift;
+                ;;
+            --qmp-port) shift; qmpPort=$1; shift;
                 ;;
             --monitor-path) shift; monitorPath=$1; shift;
                 ;;
@@ -447,6 +451,10 @@ initConfig()
     if [ -n "$qemuName" ];then
         base_sets+=" -name $qemuName"
     fi
+    if [ -n "$qmpPort" ];then
+        # base_sets+=" -qmp tcp:localhost:${qmpPort},server,nowait"
+        base_sets+=" -qmp tcp:127.0.0.1:${qmpPort},server,nowait"
+    fi
 
     if [ -z "$macaddr" ];then
         macaddr=08:00:27:23:35:32
@@ -491,7 +499,8 @@ initConfig()
         ich9_cfg_path=$cur_file_dir/ich9-ehci-uhci.cfg
     fi
 
-    spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing"
+    spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
+    # spice_sets="-device virtio-gpu,virgl=on -spice gl=on,port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
     # for agent copy and paste
     spice_sets+=" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
     spice_sets+=" -device virtserialport,chardev=vdagent,name=com.redhat.spice.0"

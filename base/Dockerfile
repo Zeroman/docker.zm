@@ -11,12 +11,13 @@ RUN dpkg --add-architecture i386 \
         sudo less tree file cpio patch wget curl rsync net-tools expect \
         xz-utils bzip2 zip unzip lzop p7zip p7zip-rar lzma lzop \
         bc procps kmod dosfstools dos2unix exfat-utils \
-        make cmake gcc-multilib g++ gdb strace \
+        gcc-multilib g++-multilib make cmake gdb strace \
         graphviz pkg-config automake autoconf \
         vim-nox git cgvg distcc-pump distcc \
         python python-pip libpython-dev \
-        libstdc++-4.9-dev:i386 libncurses5-dev:i386 zlib1g-dev:i386 \
-        libstdc++-4.9-dev libncurses5-dev zlib1g-dev \
+        libncurses5-dev:i386 zlib1g-dev:i386 \
+        libncurses5-dev zlib1g-dev \
+        lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
         && apt-file update \
         && pip install supervisor
 
@@ -29,5 +30,8 @@ RUN mkdir -p /home/developer && \
     echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer && \
     chmod 0440 /etc/sudoers.d/developer && \
     chown ${UID}:${GID} -R /home/developer
+
+# RUN apt-get install -y --no-install-recommends -t jessie-backports \
+
 
 CMD ["supervisord"]

@@ -1,14 +1,14 @@
-FROM zeroman/base
+FROM zeroman/x11
 
 RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
 
 RUN echo "deb http://dl.winehq.org/wine-builds/debian/ jessie main" > /etc/apt/sources.list.d/wine.list
 RUN apt-get update 
 RUN apt-get install -y --no-install-recommends -t jessie-backports \
-        wine-devel winehq-devel winetricks ttf-mscorefonts-installer 
+        wine-devel winehq-devel winetricks ttf-mscorefonts-installer libgl1-mesa-dri:i386
 
-RUN apt-get install -y --no-install-recommends -t jessie-backports \
-        libgl1-mesa-dri:i386
+# RUN apt-get install -y --no-install-recommends -t jessie-backports \
+
 
 ADD lang.sh /etc/profile.d/
 RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales

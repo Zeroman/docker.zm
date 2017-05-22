@@ -15,6 +15,22 @@ build_virgl()
     make install
 }
 
+build_epoxy()
+{
+    test -e /usr/local/lib/libepoxy.so && return
+
+    cd $BUILD_ROOT
+    if [ ! -d libepoxy ];then
+        git clone https://github.com/anholt/libepoxy.git
+        git checkout 1.4.2 -b 1.4.2
+    fi
+    cd libepoxy
+    test -e configure || test -e autogen.sh && ./autogen.sh --prefix=/usr
+    # ./configure --prefix=/usr
+    $MAKE
+    make install
+}
+
 build_celt()
 {
     test -e /usr/lib/libcelt051.so && return
@@ -87,6 +103,7 @@ mkdir -p $BUILD_ROOT
 # export PKG_CONFIG_PATH=$INST_ROOT/lib/pkgconfig:$PKG_CONFIG_PATH
 
 build_lz4
+build_epoxy
 build_celt
 build_spice_protocol
 build_spice

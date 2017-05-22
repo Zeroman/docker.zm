@@ -47,13 +47,14 @@ run_shell()
         XSOCK=/tmp/.X11-unix
         XAUTH=/tmp/.docker.xauth
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
-        docker run -it --rm --name $name --privileged --net=host $docker_opts $docker_bind \
+        docker run -it --name $name --privileged --net=host $docker_opts $docker_bind \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -v $cur_dir:/work \
             -w /work \
             zeroman/qemu_build $@
+        # ldconfig # let /usr/local/lib into runtime library path
     else
-        docker exec -it $name /bin/bash
+        docker start -i $name 
     fi
 }
 

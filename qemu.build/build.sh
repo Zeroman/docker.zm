@@ -95,12 +95,28 @@ build_qemu()
     make install
 }
 
+update_git()
+{
+    cd $BUILD_ROOT
+    for dir in $(ls -d */)
+    do
+        if [ -d $dir/.git ];then
+            cd $dir
+            git fetch
+            git pull --recurse-submodules=yes
+            cd -
+        fi
+    done
+    
+}
 
 export BUILD_ROOT=$PWD/build
 export MAKE='make -j9'
 mkdir -p $BUILD_ROOT
 # export INST_ROOT="/opt/spice"; mkdir -p $INST_ROOT
 # export PKG_CONFIG_PATH=$INST_ROOT/lib/pkgconfig:$PKG_CONFIG_PATH
+
+# update_git
 
 build_lz4
 build_epoxy

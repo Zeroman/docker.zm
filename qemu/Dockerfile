@@ -4,4 +4,4 @@ RUN apt-get install -y --no-install-recommends -t jessie-backports bridge-utils 
 
 ADD qemu.sh asus.bin bios.bin /opt/
 
-ENTRYPOINT ["/opt/qemu.sh"]
+CMD ["/opt/qemu.sh"]

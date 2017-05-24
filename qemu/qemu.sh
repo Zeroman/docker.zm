@@ -45,7 +45,7 @@ check_udev()
 defalutConfig()
 {
     qemuName=""
-    vncPort=3389
+    vncPort=1
     spicePort=5900
     spiceTitle="spice"
     clientSSHPort=""
@@ -437,7 +437,7 @@ initConfig()
     test -z "$sys_disk_type" && sys_disk_type="$diskIF"
     test -z "$work_disk_type" && work_disk_type="$diskIF"
     test -z "$temp_disk_type" && temp_disk_type="$diskIF"
-    vnc_sets="-vnc 127.0.0.1:0 -redir tcp:$vncPort::$vncPort"
+    vnc_sets="-vnc :$vncPort -vga cirrus"
     usb_sets="-usb -usbdevice tablet $(genUsbDeviceSet)"
     test -e "$sys_img" && disk_sets+=" -drive file=${sys_img},if=$sys_disk_type,cache=writeback"
     test -e "$temp_img" && disk_sets+=" -drive file=${temp_img},if=$temp_disk_type,cache=writeback"

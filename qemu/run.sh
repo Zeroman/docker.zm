@@ -44,14 +44,10 @@ run_shell()
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
-        XSOCK=/tmp/.X11-unix
-        XAUTH=/tmp/.docker.xauth
-        xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name --privileged --net=host $docker_opts $docker_bind \
-            -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -v $cur_dir:/work \
             -w /work \
-            zeroman/qemu $@
+            zeroman/qemu /bin/bash
     else
         docker exec -it $name /bin/bash
     fi

@@ -564,6 +564,8 @@ kvmExcute()
     case $1 in
         --start-server-vnc)
             $QEMU $common_sets $vnc_sets
+            # install tigervnc
+            echo "vncviewer 10.72.7.17:1 FullScreen=1"
             ;;
         --connect-vnc)
             rdesktop 127.0.0.1:$vncPort -g 1024x768 -u root -p root -D -P -K -r sound:local -r clipboard:PRIMARYCLIPBOARD

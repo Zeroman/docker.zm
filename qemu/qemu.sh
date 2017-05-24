@@ -437,7 +437,7 @@ initConfig()
     test -z "$sys_disk_type" && sys_disk_type="$diskIF"
     test -z "$work_disk_type" && work_disk_type="$diskIF"
     test -z "$temp_disk_type" && temp_disk_type="$diskIF"
-    vnc_sets="-vnc :$vncPort -vga cirrus"
+    vnc_sets="-vnc :$vncPort -vga std"
     usb_sets="-usb -usbdevice tablet $(genUsbDeviceSet)"
     test -e "$sys_img" && disk_sets+=" -drive file=${sys_img},if=$sys_disk_type,cache=writeback"
     test -e "$temp_img" && disk_sets+=" -drive file=${temp_img},if=$temp_disk_type,cache=writeback"

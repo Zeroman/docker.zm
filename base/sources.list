@@ -1,29 +1,29 @@
-# deb http://mirrors.163.com/debian/ jessie main non-free contrib
-# deb http://mirrors.163.com/debian/ jessie-updates main non-free contrib
-# deb http://mirrors.163.com/debian/ jessie-backports main non-free contrib
-# deb http://mirrors.163.com/debian-security/ jessie/updates main non-free contrib
-#deb-src http://mirrors.163.com/debian/ jessie main non-free contrib
-#deb-src http://mirrors.163.com/debian/ jessie-updates main non-free contrib
-#deb-src http://mirrors.163.com/debian/ jessie-backports main non-free contrib
-#deb-src http://mirrors.163.com/debian-security/ jessie/updates main non-free contrib
+# deb http://mirrors.163.com/debian/ strench main non-free contrib
+# deb http://mirrors.163.com/debian/ strench-updates main non-free contrib
+# deb http://mirrors.163.com/debian/ strench-backports main non-free contrib
+# deb http://mirrors.163.com/debian-security/ strench/updates main non-free contrib
+#deb-src http://mirrors.163.com/debian/ strench main non-free contrib
+#deb-src http://mirrors.163.com/debian/ strench-updates main non-free contrib
+#deb-src http://mirrors.163.com/debian/ strench-backports main non-free contrib
+#deb-src http://mirrors.163.com/debian-security/ strench/updates main non-free contrib
 
 
-# deb http://mirrors.aliyun.com/debian/ jessie main non-free contrib
-# deb http://mirrors.aliyun.com/debian/ jessie-proposed-updates main non-free contrib
-# deb http://mirrors.aliyun.com/debian-backports/ jessie-backports main contrib non-free
-# deb http://mirrors.aliyun.com/debian-security/ jessie/updates main non-free contrib
-# deb-src http://mirrors.aliyun.com/debian/ jessie main non-free contrib
-# deb-src http://mirrors.aliyun.com/debian/ jessie-proposed-updates main non-free contrib
-# deb-src http://mirrors.aliyun.com/debian-backports/ jessie-backports main contrib non-free
-# deb-src http://mirrors.aliyun.com/debian-security/ jessie/updates main non-free contrib
+# deb http://mirrors.aliyun.com/debian/ strench main non-free contrib
+# deb http://mirrors.aliyun.com/debian/ strench-proposed-updates main non-free contrib
+# deb http://mirrors.aliyun.com/debian-backports/ strench-backports main contrib non-free
+# deb http://mirrors.aliyun.com/debian-security/ strench/updates main non-free contrib
+# deb-src http://mirrors.aliyun.com/debian/ strench main non-free contrib
+# deb-src http://mirrors.aliyun.com/debian/ strench-proposed-updates main non-free contrib
+# deb-src http://mirrors.aliyun.com/debian-backports/ strench-backports main contrib non-free
+# deb-src http://mirrors.aliyun.com/debian-security/ strench/updates main non-free contrib
 
 
-deb http://ftp2.cn.debian.org/debian/ jessie main non-free contrib
-deb http://ftp2.cn.debian.org/debian/ jessie-proposed-updates main non-free contrib
-deb http://ftp2.cn.debian.org/debian/ jessie-backports main contrib non-free
-deb http://ftp2.cn.debian.org/debian-security/ jessie/updates main non-free contrib
-# deb-src http://ftp2.cn.debian.org/debian/ jessie main non-free contrib
-# deb-src http://ftp2.cn.debian.org/debian/ jessie-proposed-updates main non-free contrib
-# deb-src http://ftp2.cn.debian.org/debian-backports/ jessie-backports main contrib non-free
-# deb-src http://ftp2.cn.debian.org/debian-security/ jessie/updates main non-free contrib
+deb http://ftp2.cn.debian.org/debian/ strench main non-free contrib
+deb http://ftp2.cn.debian.org/debian/ strench-proposed-updates main non-free contrib
+deb http://ftp2.cn.debian.org/debian/ strench-backports main contrib non-free
+deb http://ftp2.cn.debian.org/debian-security/ strench/updates main non-free contrib
+# deb-src http://ftp2.cn.debian.org/debian/ strench main non-free contrib
+# deb-src http://ftp2.cn.debian.org/debian/ strench-proposed-updates main non-free contrib
+# deb-src http://ftp2.cn.debian.org/debian-backports/ strench-backports main contrib non-free
+# deb-src http://ftp2.cn.debian.org/debian-security/ strench/updates main non-free contrib
 #

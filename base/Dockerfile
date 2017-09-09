@@ -17,8 +17,9 @@ RUN dpkg --add-architecture i386 \
         python python-pip libpython-dev \
         libncurses5-dev:i386 zlib1g-dev:i386 \
         libncurses5-dev zlib1g-dev \
-        && apt-file update \
-        && pip install supervisor
+        && apt-file update 
+
+RUN pip install setuptools supervisor
 
 # lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
 

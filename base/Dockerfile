@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:stable
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -6,7 +6,7 @@ ADD sources.list /etc/apt/sources.list
 
 RUN dpkg --add-architecture i386 \
         && apt-get update \
-        && apt-get install -y --no-install-recommends -t jessie-backports \
+        && apt-get install -y --no-install-recommends \
         locales sqlite ca-certificates openssl apt-file lsof \
         sudo less tree file cpio patch wget curl rsync net-tools expect \
         xz-utils bzip2 zip unzip lzop p7zip p7zip-rar lzma lzop \
@@ -17,9 +17,10 @@ RUN dpkg --add-architecture i386 \
         python python-pip libpython-dev \
         libncurses5-dev:i386 zlib1g-dev:i386 \
         libncurses5-dev zlib1g-dev \
-        lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
         && apt-file update \
         && pip install supervisor
+
+# lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
 
 ARG UID=1000
 ARG GID=1000

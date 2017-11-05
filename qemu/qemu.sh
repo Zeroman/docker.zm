@@ -81,7 +81,10 @@ defalutConfig()
 genUsbDeviceSet()
 {
     for dev in $usbIDs; do 
-        echo -n "-usb -usbdevice host:$dev "
+        # echo -n "-usb -usbdevice host:$dev "
+        vendorid=${dev/:*/}
+        productid=${dev/*:/}
+        echo -n "-usb -device usb-host,vendorid=$vendorid,productid=$productid"
     done
 }
 
@@ -438,7 +441,8 @@ initConfig()
     test -z "$work_disk_type" && work_disk_type="$diskIF"
     test -z "$temp_disk_type" && temp_disk_type="$diskIF"
     vnc_sets="-vnc :$vncPort -vga std"
-    usb_sets="-usb -usbdevice tablet $(genUsbDeviceSet)"
+    #usb_sets="-usb -usbdevice tablet $(genUsbDeviceSet)"
+    usb_sets="-usb -device usb-tablet $(genUsbDeviceSet)"
     test -e "$sys_img" && disk_sets+=" -drive file=${sys_img},if=$sys_disk_type,cache=writeback"
     test -e "$temp_img" && disk_sets+=" -drive file=${temp_img},if=$temp_disk_type,cache=writeback"
     test -e "$work_img" && disk_sets+=" -drive file=${work_img},if=$work_disk_type,cache=writeback"

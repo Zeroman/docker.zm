@@ -7,7 +7,7 @@ ADD sources.list /etc/apt/sources.list
 RUN dpkg --add-architecture i386 \
         && apt-get update \
         && apt-get install -y --no-install-recommends \
-        locales sqlite ca-certificates openssl apt-file lsof \
+        locales sqlite ca-certificates openssl apt-file lsof gnupg2 \
         sudo less tree file cpio patch wget curl rsync net-tools expect \
         xz-utils bzip2 zip unzip lzop p7zip p7zip-rar lzma lzop \
         bc procps kmod dosfstools dos2unix exfat-utils \
@@ -19,7 +19,9 @@ RUN dpkg --add-architecture i386 \
         libncurses5-dev zlib1g-dev \
         && apt-file update 
 
-RUN pip install setuptools supervisor
+RUN apt-get install -y --no-install-recommends python-wheel \
+        && pip install setuptools \
+        && pip install supervisor
 
 # lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
 

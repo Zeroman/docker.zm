@@ -8,7 +8,7 @@ RUN apt-get -qy --no-install-recommends install \
     openssh-client
 
 # RUN pip install shadowsocks==2.8.2
-RUN pip install shadowsocks
+RUN pip install shadowsocks==2.4.3
 
 ADD redsocks /root/
 

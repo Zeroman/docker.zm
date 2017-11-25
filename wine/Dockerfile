@@ -1,11 +1,12 @@
 FROM zeroman/x11
 
+RUN apt-get install -y --no-install-recommends gnupg2
 RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
 
-RUN echo "deb http://dl.winehq.org/wine-builds/debian/ jessie main" > /etc/apt/sources.list.d/wine.list
+RUN echo "deb http://dl.winehq.org/wine-builds/debian/ stable main" > /etc/apt/sources.list.d/wine.list
 RUN apt-get update 
-RUN apt-get install -y --no-install-recommends -t jessie-backports \
-        wine-devel winehq-devel winetricks ttf-mscorefonts-installer libgl1-mesa-dri:i386
+RUN apt-get install -y --no-install-recommends \
+        wine-devel winehq-devel winetricks ttf-mscorefonts-installer libgl1-mesa-glx:i386
 
 # RUN apt-get install -y --no-install-recommends -t jessie-backports \
 

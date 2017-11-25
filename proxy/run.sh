@@ -108,7 +108,8 @@ case $1 in
         SS_ENCRPY="aes-256-cfb"
         SS_PORT=995
         SS_HOST=45.79.91.227
-        ./shadowsocks-libev/src/ss-local -v -s $SS_HOST -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
+        docker exec -it proxy sslocal -v -s $SS_HOST -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
+        #./shadowsocks-libev/src/ss-local -v -s $SS_HOST -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
         ;;
     test)
         ;;

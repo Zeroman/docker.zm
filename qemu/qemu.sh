@@ -497,6 +497,7 @@ initConfig()
     if [ -n "$clientSSHPort" ];then
         net_sets+=" -redir tcp:$clientSSHPort::22"
     fi
+
     if [ -e "/usr/share/doc/qemu-system-common/ich9-ehci-uhci.cfg" ];then
         ich9_cfg_path=/usr/share/doc/qemu-system-common/ich9-ehci-uhci.cfg
     else
@@ -508,17 +509,28 @@ initConfig()
     # for agent copy and paste
     spice_sets+=" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
     spice_sets+=" -device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
-    # for usb redirection
-    spice_sets+=" -device ich9-usb-ehci1,id=usb 
-    -device ich9-usb-uhci1,masterbus=usb.0,firstport=0,multifunction=on 
-    -device ich9-usb-uhci2,masterbus=usb.0,firstport=2 
-    -device ich9-usb-uhci3,masterbus=usb.0,firstport=4 
+
+    spice_sets+=" -machine vmport=off "
+    # for usb 3.0
+    spice_sets+=" -device nec-usb-xhci,id=usb 
     -chardev spicevmc,name=usbredir,id=usbredirchardev1 
     -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1 
     -chardev spicevmc,name=usbredir,id=usbredirchardev2 
     -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2 
     -chardev spicevmc,name=usbredir,id=usbredirchardev3 
     -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3"
+
+    # for usb 2.0 redirection
+    # spice_sets+=" -device ich9-usb-ehci1,id=usb 
+    # -device ich9-usb-uhci1,masterbus=usb.0,firstport=0,multifunction=on 
+    # -device ich9-usb-uhci2,masterbus=usb.0,firstport=2 
+    # -device ich9-usb-uhci3,masterbus=usb.0,firstport=4 
+    # -chardev spicevmc,name=usbredir,id=usbredirchardev1 
+    # -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1 
+    # -chardev spicevmc,name=usbredir,id=usbredirchardev2 
+    # -device usb-redir,chardev=usbredirchardev2,id=usbredirdev2 
+    # -chardev spicevmc,name=usbredir,id=usbredirchardev3 
+    # -device usb-redir,chardev=usbredirchardev3,id=usbredirdev3"
     # for CAC smartcard redirection, spicy:--spice-smartcard
     # spice_sets+=" -device usb-ccid -chardev spicevmc,name=smartcard -device ccid-card-passthru,chardev=ccid"
     # Multiple monitor support

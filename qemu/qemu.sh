@@ -23,6 +23,7 @@ sys_img_size="64G"
 work_img_size="64G"
 temp_img_size="64G"
 slic_name=""
+boot_efi=false
 daemonize=false
 QEMU=qemu-system-x86_64
 
@@ -346,6 +347,8 @@ kvmConfig()
                 ;;
             --with-slic) shift; slic_name="$1"; shift;
                 ;;
+            --with-efi) boot_efi=true; shift;
+                ;;
             --create-img) create_img="yes";shift;
                 ;;
             -d|--daemonize) shift; daemonize=true;
@@ -551,7 +554,11 @@ initConfig()
     # net_sets="-net nic,model=virtio,macaddr=$macaddr -net user,smb=/work/com/color/,smbserver=10.0.2.8"
     # share_sets="-virtfs local,path=/work/com/color/,mount_tag=color,readonly"
 
-    if [ -n "$slic_name" ];then
+    if $boot_efi;then
+        if [ -e "/usr/share/ovmf/ovmf_code_x64.bin" ];then
+            bios_sets="--bios /usr/share/ovmf/ovmf_code_x64.bin"
+        fi
+    elif [ -n "$slic_name" ];then
         bios_bin=$cur_file_dir/bios.bin
         slic_bin=$cur_file_dir/${slic_name}.bin
         echo $bios_bin $slic_bin

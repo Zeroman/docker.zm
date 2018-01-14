@@ -35,6 +35,8 @@ run_zm_proxy()
     docker_opts=""
     docker_bind="" 
 
+    proxy_env $@
+
     # docker_opts+='run -it --rm --name proxy --net=host --privileged'
     docker_opts='run -i -d --name proxy --net=host --privileged'
     test -z "$http_proxy" || docker_opts+=" -e http_proxy=$http_proxy"
@@ -98,9 +100,9 @@ case $1 in
         docker rm proxy
         # docker rmi zeroman/proxy 
         ;;
-    127)
+    gg)
         run_zm_proxy socks
-        ssh -N -D $socks_inport 127 -v
+        ssh -N -D $socks_inport google -v
         ;;
     mxb)
         run_zm_proxy socks

@@ -8,11 +8,12 @@
 
 wallet=t1Y7Udc4sRAeNeML9CR1HeeUKVEHfRWZ9EN
 server=zec-cn1.dwarfpool.com
+worker=zero_$RANDOM
 # cn1-zcash.flypool.org
 
 case $1 in
     r)
-        docker run --name zcash -d kmdgeek/nheqminer /nheqminer -l $server:3333 -u t1Y7Udc4sRAeNeML9CR1HeeUKVEHfRWZ9EN.zero
+        docker run --name zcash -d kmdgeek/nheqminer /nheqminer -l $server:3333 -u $wallet.$worker
         ;;
     l)
         docker logs zcash -f

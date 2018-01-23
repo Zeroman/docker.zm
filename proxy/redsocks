@@ -47,6 +47,8 @@ proc_common_rules()
     fi
     if [ -n "$socks_proxy" ]; then
         $iptable_common -p tcp -j REDIRECT --to-ports ${socks_port}
+        # dns
+        # $iptable_common -p udp --dport 53 -j REDIRECT --to-ports ${socks_port}
     fi
 }
 

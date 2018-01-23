@@ -35,8 +35,6 @@ run_zm_proxy()
     docker_opts=""
     docker_bind="" 
 
-    proxy_env $@
-
     # docker_opts+='run -it --rm --name proxy --net=host --privileged'
     docker_opts='run -i -d --name proxy --net=host --privileged'
     test -z "$http_proxy" || docker_opts+=" -e http_proxy=$http_proxy"
@@ -57,27 +55,41 @@ run_zm_proxy()
     docker $docker_opts $docker_bind zeroman/proxy
 }
 
-
-run_shadowsocks()
+run_ssr_server()
 {
-    name=ss_proxy
+    docker run -it --rm --name ssr_server \
+        -e SERVER_ADDR=0.0.0.0 \
+        -e SERVER_PORT=8388 \
+        -e PASSWORD=sfjk \
+        -e METHOD=aes-256-cfb \
+        -e PROTOCOL=auth_aes128_sha1 \
+        -e OBFS=plain \
+        -p 3399:8388 \
+        -p 3399:8388/udp \
+        esme518/docker-shadowsocksr 
+}
 
-    SS_PASSWORD=toor
-    SS_ENCRPY=rc4-md5
-    SS_PORT=1984
-    # SS_ENCRPY=aes-256-cfb
+run_ssr_client()
+{
+    docker run -it --rm --name ssr_client \
+        -p $socks_inport:8388 \
+        -p $socks_inport:8388/udp \
+        esme518/docker-shadowsocksr \
+        sslocal -s 192.168.199.170 -p 3399 \
+        -b 0.0.0.0 -l 8388 \
+        -k sfjk -m aes-256-cfb -o plain -O auth_aes128_sha1 -vv
+}
 
-    # docker_opts='run -i -d --name $name --net=host --privileged'
-    # docker_opts="run -it --rm --name $name -p $SS_PORT:$SS_PORT"
-    docker_opts="run -i -d --name $name -p $SS_PORT:$SS_PORT"
-    id=$(docker ps -a --filter name=$name -q)
-    if [ -n "$id" ];then
-        docker stop $name
-        docker rm $name
-    fi
-    # ss_opts="ssserver -s 0.0.0.0  -p $SS_PORT -k $SS_PASSWORD -m $SS_ENCRPY --fast-open -vv"
-    ss_opts="ssserver -s 0.0.0.0  -p $SS_PORT -k $SS_PASSWORD -m $SS_ENCRPY --fast-open"
-    docker $docker_opts zeroman/proxy $ss_opts
+run_gg_ssr_client()
+{
+    docker run -it --rm --name ssr_client \
+        -p $socks_inport:8388 \
+        -p $socks_inport:8388/udp \
+        esme518/docker-shadowsocksr \
+        sslocal -s 35.201.241.163 -p 9999 \
+        -b 0.0.0.0 -l 8388 \
+        -m aes-256-cfb -o plain -O auth_aes128_sha1 \
+        -k z***** -vv
 }
 
 case $1 in
@@ -91,47 +103,31 @@ case $1 in
     bn|build_new)
         docker build -t zeroman/proxy --no-cache .
         ;;
-    r|run)
-        shift
-        run_zm_proxy $@
-        ;;
     c|clean)
         docker stop -t 5 proxy
         docker rm proxy
         # docker rmi zeroman/proxy 
         ;;
     gg)
-        run_zm_proxy socks
-        ssh -N -D $socks_inport google -v
-        ;;
-    mxb)
-        run_zm_proxy socks
-        SS_PASSWORD='mXb902!'
-        SS_ENCRPY="aes-256-cfb"
-        SS_PORT=995
-        SS_HOST=45.79.91.227
-        docker exec -it proxy sslocal -v -s $SS_HOST -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
-        #./shadowsocks-libev/src/ss-local -v -s $SS_HOST -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
+        export socks_proxy=127.0.0.1:$socks_inport
+        run_zm_proxy 
+        ssh -N -D $socks_inport gg -v
         ;;
     test)
-        ;;
-    ss|shadowsocks)
-        run_shadowsocks
-        ;;
-    sl|sslocal)
-        run_zm_proxy socks
-        shift
-        # sslocal -s 服务器地址 -p 服务器端口 -l 本地端端口 -k 密码 -m 加密方法
-        SS_PASSWORD=toor
-        SS_ENCRPY=rc4-md5
-        SS_PORT=1984
-        sslocal -s $1 -p $SS_PORT -l $socks_inport -k $SS_PASSWORD -m $SS_ENCRPY 
         ;;
     log)
         docker exec -it proxy cat /root/stderr
         docker exec -it proxy cat /root/stdout
         ;;
+    ssrs)
+        run_ssr_server
+        ;;
+    ssrc)
+        run_ssr_client
+        ;;
+    gg_ssrc)
+        run_gg_ssr_client
+        ;;
     *)
-        run_zm_proxy $@
         ;;
 esac

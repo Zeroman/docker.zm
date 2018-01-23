@@ -9,12 +9,18 @@ run_telegram()
         --device /dev/snd \
         -v /etc/localtime:/etc/localtime:ro \
         -v $PWD/.TelegramDesktop:/root/.local/share/TelegramDesktop/ \
-        xorilog/telegram
+        zeroman/tg
 
+        # xorilog/telegram
 }
 
-
 case $1 in
+    b|build)
+        docker build -t zeroman/tg --build-arg GID=$GROUPS --build-arg UID=$UID .
+        ;;
+    bn|build_new)
+        docker build -t zeroman/tg --no-cache --build-arg GID=$GROUPS --build-arg UID=$UID .
+        ;;
     c|clean)
         docker stop telegram
         docker rm telegram

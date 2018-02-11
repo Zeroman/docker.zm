@@ -128,6 +128,10 @@ case $1 in
     gg_ssrc)
         run_gg_ssr_client
         ;;
+    socks)
+        export socks_proxy=127.0.0.1:$socks_inport
+        run_zm_proxy 
+        ;;
     *)
         ;;
 esac

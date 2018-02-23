@@ -15,6 +15,7 @@ RUN dpkg --add-architecture i386 \
         graphviz pkg-config automake autoconf \
         vim-nox git cgvg distcc-pump distcc \
         python python-pip libpython-dev \
+        python3 python3-pip libpython3-dev \
         libncurses5-dev:i386 zlib1g-dev:i386 \
         libncurses5-dev zlib1g-dev \
         && apt-file update 

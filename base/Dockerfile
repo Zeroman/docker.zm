@@ -7,7 +7,7 @@ ADD sources.list /etc/apt/sources.list
 RUN dpkg --add-architecture i386 \
         && apt-get update \
         && apt-get install -y --no-install-recommends \
-        locales sqlite ca-certificates openssl apt-file lsof gnupg2 \
+        locales sqlite3 ca-certificates openssl apt-file lsof gnupg2 \
         sudo less tree file cpio patch wget curl rsync net-tools expect \
         xz-utils bzip2 zip unzip lzop p7zip p7zip-rar lzma lzop \
         bc procps kmod dosfstools dos2unix exfat-utils \

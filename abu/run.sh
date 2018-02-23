@@ -44,6 +44,9 @@ case $opt in
         docker rm zeroman/abu
         docker rmi zeroman/abu
         ;;
+    exec)
+        docker exec -it abu_abu bash
+        ;;
     *)
         run_image 
         ;;

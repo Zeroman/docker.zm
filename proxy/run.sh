@@ -89,7 +89,7 @@ run_gg_ssr_client()
         sslocal -s 35.201.241.163 -p 9999 \
         -b 0.0.0.0 -l 8388 \
         -m aes-256-cfb -o plain -O auth_aes128_sha1 \
-        -k z***** -vv
+        -k zeroman -vv
 }
 
 case $1 in

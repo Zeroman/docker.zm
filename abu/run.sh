@@ -16,9 +16,10 @@ run_image()
 
     name="abu_$(basename $cur_dir)"
     docker run -it --rm --name $name $docker_opts $docker_bind \
-            -e UID=$UID -v $cur_dir:/work -w /work \
-            -p 4444:8888 \
-            zeroman/abu $@
+        -e UID=$UID -v $cur_dir:/work -w /work \
+        -v $cur_dir/abu_home:/home/developer/abu \
+        -p 4444:8888 \
+        zeroman/abu $@
 }
 
 opt=$1

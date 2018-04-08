@@ -41,7 +41,8 @@ case $opt in
         ;;
     test)
         # rsync localhost::share 
-        rsync rsync://localhost:/share 
+        #rsync rsync://localhost:/share 
+        rsync rsync://test1@localhost:/share 
         ;;
     sync)
         rsync -avz rsync://$1:/share .

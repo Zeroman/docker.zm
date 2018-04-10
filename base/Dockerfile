@@ -28,6 +28,8 @@ RUN apt-get install -y --no-install-recommends python-wheel \
 ARG UID=1000
 ARG GID=1000
 
+ENV LANG C.UTF-8
+
 RUN mkdir -p /home/developer && \
     echo "developer:x:${UID}:${GID}:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
     echo "developer:x:${UID}:" >> /etc/group && \

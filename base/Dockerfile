@@ -14,14 +14,17 @@ RUN dpkg --add-architecture i386 \
         gcc-multilib g++-multilib make cmake gdb strace \
         graphviz pkg-config automake autoconf \
         vim-nox git cgvg distcc-pump distcc \
-        python python-pip libpython-dev python-setuptools \
-        python3 python3-pip libpython3-dev python3-setuptools \
+        python libpython-dev python3 libpython3-dev \
         libncurses5-dev:i386 zlib1g-dev:i386 \
         libncurses5-dev zlib1g-dev \
         && apt-file update 
 
-RUN apt-get install -y --no-install-recommends python-wheel \
-        && pip install supervisor
+RUN apt-get install -y --no-install-recommends \
+        python-pip python3-pip python-wheel \
+        && pip install -U pip \
+        && pip install -U supervisor setuptools \
+        && pip3 install -U pip \
+        && pip3 install -U setuptools
 
 # lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
 

@@ -20,11 +20,9 @@ RUN dpkg --add-architecture i386 \
         && apt-file update 
 
 RUN apt-get install -y --no-install-recommends \
-        python-pip python3-pip python-wheel \
-        && pip install -U pip \
-        && pip install -U supervisor setuptools \
-        && pip3 install -U pip \
-        && pip3 install -U setuptools
+        python-pip python-wheel python-setuptools \
+        python3-pip python3-setuptools \
+        && pip install -U supervisor 
 
 # lib32stdc++6-4.9-dbg libx32stdc++6-4.9-dbg \
 

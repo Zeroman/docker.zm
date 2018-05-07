@@ -69,6 +69,9 @@ case $opt in
         docker rm zeroman/qemu
         docker rmi zeroman/qemu
         ;;
+    dl)
+        wget https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe -O spice-guest-tools-latest.exe
+        ;;
     *)
         run_shell $opt $@
         ;;

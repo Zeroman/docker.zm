@@ -89,7 +89,7 @@ run_gg_ssr_client()
         python local.py -s 35.200.102.119 -p 9999 \
         -b 0.0.0.0 -l 8388 \
         -m aes-256-cfb -o http_post -O auth_aes128_sha1 \
-        -k sfjk -vv
+        -k "" -vv
 }
 
 case $1 in

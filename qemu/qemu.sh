@@ -451,7 +451,8 @@ initConfig()
     test -e "$work_img" && disk_sets+=" -drive file=${work_img},if=$work_disk_type,cache=writeback"
     test -e "$floppy_img" && disk_sets+=" -fda ${floppy_img}"
     # -cpu kvm64 -M pc 
-    base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm -nodefaults -balloon virtio"
+    #base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm -nodefaults -balloon virtio"
+    base_sets="-rtc base=localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm -nodefaults --device virtio-balloon"
     if $daemonize;then
         base_sets+=" --daemonize"
     fi

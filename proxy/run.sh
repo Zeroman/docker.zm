@@ -63,10 +63,10 @@ run_ssr_server()
         -e PASSWORD=sfjk \
         -e METHOD=aes-256-cfb \
         -e PROTOCOL=auth_aes128_sha1 \
-        -e OBFS=plain \
+        -e OBFS=http_post \
         -p 3399:8388 \
         -p 3399:8388/udp \
-        esme518/docker-shadowsocksr 
+        breakwa11/shadowsocksr 
 }
 
 run_ssr_client()
@@ -74,10 +74,10 @@ run_ssr_client()
     docker run -it --rm --name ssr_client \
         -p $socks_inport:8388 \
         -p $socks_inport:8388/udp \
-        esme518/docker-shadowsocksr \
+        breakwa11/shadowsocksr \
         sslocal -s 192.168.199.170 -p 3399 \
         -b 0.0.0.0 -l 8388 \
-        -k sfjk -m aes-256-cfb -o plain -O auth_aes128_sha1 -vv
+        -k sfjk -m aes-256-cfb -o http_post -O auth_aes128_sha1 -vv
 }
 
 run_gg_ssr_client()
@@ -85,11 +85,11 @@ run_gg_ssr_client()
     docker run -it --rm --name ssr_client \
         -p $socks_inport:8388 \
         -p $socks_inport:8388/udp \
-        esme518/docker-shadowsocksr \
-        sslocal -s 35.201.241.163 -p 9999 \
+        breakwa11/shadowsocksr \
+        python local.py -s 35.200.102.119 -p 9999 \
         -b 0.0.0.0 -l 8388 \
-        -m aes-256-cfb -o plain -O auth_aes128_sha1 \
-        -k zeroman -vv
+        -m aes-256-cfb -o http_post -O auth_aes128_sha1 \
+        -k sfjk -vv
 }
 
 case $1 in

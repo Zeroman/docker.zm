@@ -3,10 +3,22 @@
 
 run_telegram()
 {
+    #--device /dev/snd \
+    #-v /tmp/.X11-unix:/tmp/.X11-unix \
+    #-e DISPLAY=unix$DISPLAY \
+
+    XSOCK=/tmp/.X11-unix
+    XAUTH=/tmp/.docker.xauth
+    xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
     docker run --rm -it --name telegram \
-        -v /tmp/.X11-unix:/tmp/.X11-unix \
-        -e DISPLAY=unix$DISPLAY \
-        --device /dev/snd \
+        -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
+        -e UID=$UID \
+        -e XMODIFIERS=@im=fcitx \
+        -e GTK_IM_MODULE=fcitx \
+        -e QT_IM_MODULE=fcitx \
+        -e LANG=zh_CN.UTF-8  \
+        -e LANGUAGE=zh_CN:zh  \
+        -e LC_ALL=zh_CN.UTF-8 \
         -v /etc/localtime:/etc/localtime:ro \
         -v $PWD/.TelegramDesktop:/root/.local/share/TelegramDesktop/ \
         zeroman/tg
@@ -26,8 +38,8 @@ case $1 in
         docker rm telegram
         ;;
     *)
-        xhost +
+        #xhost +
         run_telegram
-        xhost -
+        #xhost -
         ;;
 esac

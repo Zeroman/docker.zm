@@ -22,6 +22,8 @@ RUN wget https://tdesktop.com/linux -O /tmp/telegram.tar.xz && \
     rm /etc/fonts/conf.d/10-scale-bitmap-fonts.conf && \
     fc-cache -fv
 
+RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
+
 ENV QT_XKB_CONFIG_ROOT=/usr/share/X11/xkb
 
 # Autorun Telegram

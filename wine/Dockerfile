@@ -12,7 +12,8 @@ RUN apt-get install -y --no-install-recommends \
 
 
 # ADD lang.sh /etc/profile.d/
-RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
+#RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
+RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # USER developer
 
 # RUN apt-get install -y # playonlinux

@@ -53,6 +53,9 @@ run_image()
         XAUTH=/tmp/.docker.xauth
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+            -e XMODIFIERS=@im=fcitx \
+            -e GTK_IM_MODULE=fcitx \
+            -e QT_IM_MODULE=fcitx \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -v $cur_dir:/work -w /work \
             -e UID=$UID -v $cur_workdir/run.sh:/opt/wine/run.sh \
@@ -64,9 +67,13 @@ run_image()
 
 wine_setup()
 {
-    export LANG=zh_CN.UTF-8  
+    #export LANG=zh_CN.UTF-8  
+    #export LANGUAGE=zh_CN:zh  
+    #export LC_ALL=zh_CN.UTF-8 
+    export LANG=zh_CN.GB2312
     export LANGUAGE=zh_CN:zh  
-    export LC_ALL=zh_CN.UTF-8 
+    export LC_ALL=zh_CN.GB2312
+
     export WINEARCH=win32
 
     if [ ! ~/.wine ];then
@@ -76,7 +83,7 @@ wine_setup()
 
         wineboot -u
     fi
-    # wine explorer /desktop=DockerDesktop,1024x768
+    #wine explorer /desktop=DockerDesktop,1024x768
     wine explorer Z:\\work
     bash
 }

@@ -22,7 +22,14 @@ run_image()
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
+        XSOCK=/tmp/.X11-unix
+        XAUTH=/tmp/.docker.xauth
+        xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+            -e XMODIFIERS=@im=fcitx \
+            -e GTK_IM_MODULE=fcitx \
+            -e QT_IM_MODULE=fcitx \
+            -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -u developer \
             -v $cur_dir:/work \
             -w /work \
@@ -31,20 +38,6 @@ run_image()
         docker start -it $name
     fi
 }
-
-start_distcc_server()
-{
-    name=distcc_server
-    id=$(docker ps -a --filter name=$name -q)
-    if [ -n "$id" ];then
-        docker kill $name
-        docker rm $name
-    fi
-    docker run -it -d --name $name --net=host zeroman/x11 \
-        distccd --daemon --user nobody --no-detach --allow 0.0.0.0/0
-
-}
- 
 
 opt=$1
 shift
@@ -61,9 +54,6 @@ case $opt in
     c|clean)
         docker rm zeroman/x11
         docker rmi zeroman/x11
-        ;;
-    distcc)
-        start_distcc_server
         ;;
     sd|stop_distcc)
         name=distccd

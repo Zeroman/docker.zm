@@ -10,7 +10,7 @@ RUN apt-get -qy --no-install-recommends install \
 
 # RUN pip install shadowsocks==2.8.2
 # RUN pip install shadowsocks==2.4.3
-RUN pip --no-cache-dir install https://github.com/shadowsocksr-backup/shadowsocksr/archive/manyuser.zip 
+#RUN pip --no-cache-dir install https://github.com/shadowsocksr-backup/shadowsocksr/archive/manyuser.zip 
 
 ADD redsocks /root/
 

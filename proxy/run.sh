@@ -21,7 +21,7 @@ proxy_env()
             export https_proxy=https://proxy2.eg.com:80
             ;;
         socks)
-            export gateway="yes"
+            export gateway="no"
             # export ignore_addrs="45.79.91.227:22,45.79.91.226:22"
             export socks_proxy=127.0.0.1:$socks_inport
             ;;
@@ -55,6 +55,18 @@ run_zm_proxy()
     docker $docker_opts $docker_bind zeroman/proxy
 }
 
+run_ssr_client()
+{
+    docker run -it --rm --name ssr_client \
+        -p $socks_inport:8388 \
+        -p $socks_inport:8388/udp \
+        breakwa11/shadowsocksr \
+        sslocal -s 192.168.199.170 -p 3399 \
+        -b 0.0.0.0 -l 8388 \
+        -k sfjk -m aes-256-cfb -o http_post -O auth_aes128_sha1 -vv
+}
+
+
 run_ssr_server()
 {
     docker run -it --rm --name ssr_server \
@@ -69,29 +81,6 @@ run_ssr_server()
         breakwa11/shadowsocksr 
 }
 
-run_ssr_client()
-{
-    docker run -it --rm --name ssr_client \
-        -p $socks_inport:8388 \
-        -p $socks_inport:8388/udp \
-        breakwa11/shadowsocksr \
-        sslocal -s 192.168.199.170 -p 3399 \
-        -b 0.0.0.0 -l 8388 \
-        -k sfjk -m aes-256-cfb -o http_post -O auth_aes128_sha1 -vv
-}
-
-run_gg_ssr_client()
-{
-    docker run -it --rm --name ssr_client \
-        -p $socks_inport:8388 \
-        -p $socks_inport:8388/udp \
-        breakwa11/shadowsocksr \
-        python local.py -s 35.200.102.119 -p 9999 \
-        -b 0.0.0.0 -l 8388 \
-        -m aes-256-cfb -o http_post -O auth_aes128_sha1 \
-        -k "" -vv
-}
-
 case $1 in
     fw)
         shift
@@ -104,14 +93,15 @@ case $1 in
         docker build -t zeroman/proxy --no-cache .
         ;;
     c|clean)
-        docker stop -t 5 proxy
-        docker rm proxy
+        docker stop proxy
+        #docker rm proxy
         # docker rmi zeroman/proxy 
         ;;
     gg)
         export socks_proxy=127.0.0.1:$socks_inport
-        run_zm_proxy 
-        ssh -N -D $socks_inport gg -v
+        #run_zm_proxy 
+        #ssh -N -D $socks_inport aly -v
+        ssh -N -D $socks_inport rb -v
         ;;
     test)
         ;;
@@ -125,13 +115,12 @@ case $1 in
     ssrc)
         run_ssr_client
         ;;
-    gg_ssrc)
-        run_gg_ssr_client
-        ;;
     socks)
         export socks_proxy=127.0.0.1:$socks_inport
         run_zm_proxy 
         ;;
     *)
+        export socks_proxy=127.0.0.1:$socks_inport
+        run_zm_proxy 
         ;;
 esac

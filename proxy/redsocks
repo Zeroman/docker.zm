@@ -130,10 +130,12 @@ parse_port() {
 
 stop() {
     echo "Cleaning iptables"
-    if [ -n "$docker_iface" ];then
-        prerouting_iptables_rules D "$docker_iface"
+    if [ "$gateway" = "yes" ]; then
+        if [ -n "$docker_iface" ];then
+            prerouting_iptables_rules D "$docker_iface"
+        fi
+        prerouting_iptables_rules D ${default_iface}
     fi
-    prerouting_iptables_rules D ${default_iface}
     default_iptables_rules D
     pkill -9 redsocks
     if [ "$gateway" = "yes" ]; then
@@ -199,10 +201,12 @@ run() {
         done
     fi
 
-    if [ -n "$docker_iface" ];then
-        prerouting_iptables_rules A "$docker_iface"
+    if [ "$gateway" = "yes" ]; then
+        if [ -n "$docker_iface" ];then
+            prerouting_iptables_rules A "$docker_iface"
+        fi
+        prerouting_iptables_rules A ${default_iface}
     fi
-    prerouting_iptables_rules A ${default_iface}
     default_iptables_rules A
     /usr/sbin/redsocks -c /tmp/redsocks.conf &
 

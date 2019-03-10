@@ -47,7 +47,9 @@ start_distcc_server()
  
 
 opt=$1
-shift
+if [ -n "$@" ];then
+    shift
+fi
 case $opt in
     b|build)
         docker build -t zeroman/base --build-arg GID=$GROUPS --build-arg UID=$UID .

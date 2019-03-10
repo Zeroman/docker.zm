@@ -13,7 +13,7 @@ RUN dpkg --add-architecture i386 \
         bc procps kmod dosfstools dos2unix exfat-utils \
         gcc-multilib g++-multilib make cmake gdb strace \
         graphviz pkg-config automake autoconf \
-        vim-nox git cgvg distcc-pump distcc \
+        vim-nox git cgvg \
         python libpython-dev python3 libpython3-dev \
         libncurses5-dev:i386 zlib1g-dev:i386 \
         libncurses5-dev zlib1g-dev \

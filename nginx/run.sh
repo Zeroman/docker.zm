@@ -22,8 +22,8 @@
 
 case $1 in
     key)
-        openssl req -x509 -nodes -newkey rsa:2048 -keyout usms.key -out usms.crt -subj \
-            "/C=CN/ST=Guangdong/L=Shenzhen/O=ZNV/OU=usms.znv.com/CN=usms.znv.com"
+        openssl req -x509 -nodes -newkey rsa:2048 -keyout proxy.key -out proxy.crt -subj \
+            "/C=CN/ST=Guangdong/L=Shenzhen/O=ZCC/OU=test.cc/CN=test.cc"
         ;;
 
     c|clean)

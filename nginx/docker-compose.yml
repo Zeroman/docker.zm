@@ -1,14 +1,14 @@
-version: '2'
+version: '3'
 
 services:
-  usms_proxy:
+  proxy:
     restart: always
     image: nginx:alpine
     volumes:
-    - ./usms.conf:/etc/nginx/conf.d/default.conf
-    - ./usms.crt:/etc/nginx/certs/usms.crt
-    - ./usms.key:/etc/nginx/certs/usms.key
+    - ./proxy.conf:/etc/nginx/conf.d/default.conf
+    - ./proxy.crt:/etc/nginx/certs/proxy.crt
+    - ./proxy.key:/etc/nginx/certs/proxy.key
+    - ./www:/www
     ports:
     - "80:80"
     - "443:443"
-    - "44300:44300"

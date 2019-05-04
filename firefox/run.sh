@@ -21,10 +21,6 @@ run_image()
         docker_opts+=" --privileged"
     fi
 
-    if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:$firefox_home/.bashrc:ro"
-    fi
-
     if [ -d /dev/snd ];then
         # docker_opts+=" --group-add audio"
         docker_bind+=" --device /dev/snd"
@@ -39,16 +35,24 @@ run_image()
         XAUTH=/tmp/.docker.xauth
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
-            -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
-            -e UID=$UID \
+            -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY -e UID=$UID \
+            -u developer \
+            -v $cur_dir:/home/developer \
+            -w /work \
+            -e XMODIFIERS=@im=fcitx \
+            -e GTK_IM_MODULE=xim \
+            -e QT_IM_MODULE=xim \
             zeroman/firefox bash
     else
         docker start -i $name
     fi
 }
 
-opt=$1
-shift
+opt=''
+if [ -n "$1" ];then
+    opt=$1
+    shift
+fi
 case $opt in
     b|build)
         docker build -t zeroman/firefox .

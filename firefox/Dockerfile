@@ -1,7 +1,15 @@
 FROM zeroman/x11
 
-RUN apt-get install -y --no-install-recommends iceweasel
+#RUN apt-get install -y --no-install-recommends iceweasel
+RUN apt-get install -y --no-install-recommends libgtk-3-0 libdbus-glib-1-2
+
+RUN wget -O /tmp/setup "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US" \
+    && tar xvf /tmp/setup -C /opt \
+    && ln -s /opt/firefox/firefox /usr/bin/firefox \
+    && rm -fv /tmp/setup
 
 #RUN wget https://addons.mozilla.org/firefox/downloads/file/303844/selenium_ide-2.9.1-fx.xpi -O /root/selenium_ide.xpi
+#RUN wget https://addons.mozilla.org/firefox/downloads/file/1699112/firex_proxy-5.2.5-fx.xpi -O /root/firex_proxy-5.2.5-fx.xpi
+#RUN firefox --headless --install-global-extension /root/firex_proxy-5.2.5-fx.xpi
 
 #RUN firefox --install-global-extension /root/selenium_ide.xpi

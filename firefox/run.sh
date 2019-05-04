@@ -21,6 +21,8 @@ run_image()
         docker_opts+=" --privileged"
     fi
 
+    docker_opts=" --network host"
+
     if [ -d /dev/snd ];then
         # docker_opts+=" --group-add audio"
         docker_bind+=" --device /dev/snd"
@@ -28,6 +30,10 @@ run_image()
         docker_bind+=" -v /dev/shm:/dev/shm"
     fi
 
+    cmd=firefox
+    if [ -n "$@" ];then
+        cmd=$@
+    fi
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
         # xhost +
@@ -42,7 +48,7 @@ run_image()
             -e XMODIFIERS=@im=fcitx \
             -e GTK_IM_MODULE=xim \
             -e QT_IM_MODULE=xim \
-            zeroman/firefox bash
+            zeroman/firefox $cmd
     else
         docker start -i $name
     fi
@@ -69,8 +75,11 @@ case $opt in
     ci|clean_image)
         docker rmi zeroman/firefox
         ;;
+    sh)
+        run_image bash
+        ;;
     *)
-        run_image $*
+        run_image
         ;;
 esac
 

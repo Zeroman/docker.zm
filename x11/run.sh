@@ -27,8 +27,8 @@ run_image()
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
             -e XMODIFIERS=@im=fcitx \
-            -e GTK_IM_MODULE=fcitx \
-            -e QT_IM_MODULE=fcitx \
+            -e GTK_IM_MODULE=xim \
+            -e QT_IM_MODULE=xim \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
             -u developer \
             -v $cur_dir:/work \
@@ -40,7 +40,9 @@ run_image()
 }
 
 opt=$1
-shift
+if [ -n "$opt" ];then
+    shift
+fi
 case $opt in
     b|build)
         docker build -t zeroman/x11 --build-arg GID=$GROUPS --build-arg UID=$UID .

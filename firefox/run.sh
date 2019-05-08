@@ -31,7 +31,7 @@ run_image()
     fi
 
     cmd=firefox
-    if [ -n "$@" ];then
+    if [ -n "$1" ];then
         cmd=$@
     fi
     id=$(docker ps -a --filter name=$name -q)

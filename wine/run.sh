@@ -109,7 +109,9 @@ wine_zhcn_font()
 
 
 opt=$1
-shift
+if [ -n "$opt" ];then
+    shift
+fi
 case $opt in
     b|build)
         docker build -t zeroman/wine .

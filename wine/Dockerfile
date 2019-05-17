@@ -5,8 +5,12 @@ RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
 
 RUN echo "deb http://dl.winehq.org/wine-builds/debian/ stable main" > /etc/apt/sources.list.d/wine.list
 RUN apt-get update 
+
 RUN apt-get install -y --no-install-recommends \
-        wine-devel winehq-devel winetricks ttf-mscorefonts-installer libgl1-mesa-glx:i386
+        ttf-mscorefonts-installer libgl1-mesa-glx:i386
+
+RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
+        wine-devel winehq-devel winetricks
 
 # RUN apt-get install -y --no-install-recommends -t jessie-backports \
 

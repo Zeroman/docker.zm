@@ -1,6 +1,6 @@
 FROM zeroman/x11
 
-RUN apt-get install -y --no-install-recommends gnupg2
+RUN apt-get install -y --no-install-recommends gnupg2 zenity
 RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
 
 RUN echo "deb http://dl.winehq.org/wine-builds/debian/ stable main" > /etc/apt/sources.list.d/wine.list

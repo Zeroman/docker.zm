@@ -77,7 +77,7 @@ wine_setup()
     export WINEARCH=win32
 
     if [ ! ~/.wine ];then
-        # winetricks mfc42 #odbc32
+        winetricks mfc42 #odbc32
         winetricks vcrun6 vcrun6sp6
         winetricks vcrun2005 vcrun2008 vcrun2010 vcrun2012 vcrun2013
 

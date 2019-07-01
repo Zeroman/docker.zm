@@ -36,6 +36,7 @@ run_image()
     fi
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
+        pkill firefox
         # xhost +
         XSOCK=/tmp/.X11-unix
         XAUTH=/tmp/.docker.xauth

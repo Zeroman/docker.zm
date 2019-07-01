@@ -18,7 +18,11 @@ run_image()
         docker_bind+=" -v $cur_dir/supervisord.conf:/etc/supervisord.conf"
     fi
 
-    name=base-$(basename $cur_dir)-$1
+    dirname=$(echo "$(basename $cur_dir)" | awk '{print gensub(/[^!-~]/,"","g",$0)}')
+    name=base-$dirname
+    if [ -z "$dirname" ];then
+        name=base-$RANDOM
+    fi
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
@@ -47,7 +51,7 @@ start_distcc_server()
  
 
 opt=$1
-if [ -n "$@" ];then
+if [ -n "$opt" ];then
     shift
 fi
 case $opt in

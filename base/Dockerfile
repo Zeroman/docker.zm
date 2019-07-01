@@ -8,7 +8,7 @@ RUN dpkg --add-architecture i386 \
         && apt-get update \
         && apt-get install -y --no-install-recommends \
         locales sqlite3 ca-certificates openssl apt-file lsof gnupg2 \
-        sudo less tree file cpio patch wget curl rsync net-tools expect \
+        sudo less tree file cpio patch wget curl rsync net-tools expect gawk \
         xz-utils bzip2 zip unzip lzop p7zip p7zip-rar lzma lzop \
         bc procps kmod dosfstools dos2unix exfat-utils \
         gcc-multilib g++-multilib make cmake gdb strace \

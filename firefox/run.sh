@@ -41,7 +41,7 @@ run_image()
         XSOCK=/tmp/.X11-unix
         XAUTH=/tmp/.docker.xauth
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
-        docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+        docker run -it --rm --name $name $docker_opts $docker_bind \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY -e UID=$UID \
             -u developer \
             -v $cur_dir:/home/developer \

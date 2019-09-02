@@ -1,19 +1,10 @@
 FROM zeroman/x11
 
-RUN apt-get install -y --no-install-recommends gnupg2 zenity
-RUN wget http://dl.winehq.org/wine-builds/Release.key && apt-key add Release.key
+RUN wget http://dl.winehq.org/wine-builds/winehq.key && apt-key add winehq.key
 
-RUN echo "deb http://dl.winehq.org/wine-builds/debian/ stable main" > /etc/apt/sources.list.d/wine.list
-RUN apt-get update 
+RUN echo "deb https://dl.winehq.org/wine-builds/debian/ buster main" > /etc/apt/sources.list.d/wine.list
 
-RUN apt-get install -y --no-install-recommends \
-        ttf-mscorefonts-installer libgl1-mesa-glx:i386
-
-RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
-        wine-devel winehq-devel winetricks
-
-# RUN apt-get install -y --no-install-recommends -t jessie-backports \
-
+RUN apt-get update && apt-get install -y --install-recommends winehq-stable winetricks
 
 # ADD lang.sh /etc/profile.d/
 #RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales

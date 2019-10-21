@@ -64,8 +64,10 @@ defalutConfig()
     diskIF=ide
     # diskIF=none
     # diskIF=scsi
-    # diskIF=virtio
-    net_dev_type=e1000 # ne2k_pci,i82551,i82557b,i82559er,rtl8139,e1000,pcnet,virtio
+    #diskIF=virtio
+    #Supported NIC models: e1000 e1000-82544gc e1000-82545em e1000e i82550 i82551 i82557a i82557b i82557c i82558a i82558b i82559a i82559b i82559c i82559er i82562 i82801 ne2k_pci pcnet rocker rtl8139 virtio-net-pci virtio-net-pci-non-transitional virtio-net-pci-transitional vmxnet3
+    #net_dev_type=virtio-net-pci #qemu-system-x86_64 -nic model=help
+    net_dev_type=e1000
 
     extName=tmp
     extImgDir=""
@@ -446,9 +448,10 @@ initConfig()
     vnc_sets="-vnc :$vncPort -vga std"
     #usb_sets="-usb -usbdevice tablet $(genUsbDeviceSet)"
     usb_sets="-usb -device usb-tablet $(genUsbDeviceSet)"
-    test -e "$sys_img" && disk_sets+=" -drive file=${sys_img},if=$sys_disk_type,cache=writeback"
-    test -e "$temp_img" && disk_sets+=" -drive file=${temp_img},if=$temp_disk_type,cache=writeback"
-    test -e "$work_img" && disk_sets+=" -drive file=${work_img},if=$work_disk_type,cache=writeback"
+    cache_type=writeback
+    test -e "$sys_img" && disk_sets+=" -drive file=${sys_img},if=$sys_disk_type,cache=$cache_type"
+    test -e "$temp_img" && disk_sets+=" -drive file=${temp_img},if=$temp_disk_type,cache=$cache_type"
+    test -e "$work_img" && disk_sets+=" -drive file=${work_img},if=$work_disk_type,cache=$cache_type"
     test -e "$floppy_img" && disk_sets+=" -fda ${floppy_img}"
     # -cpu kvm64 -M pc 
     #base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm -nodefaults -balloon virtio"

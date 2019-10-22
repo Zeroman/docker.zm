@@ -16,7 +16,7 @@ RUN dpkg --add-architecture i386 \
         vim-nox git cgvg \
         python libpython-dev python3 libpython3-dev \
         libncurses5-dev:i386 zlib1g-dev:i386 \
-        libncurses5-dev zlib1g-dev \
+        libncurses5-dev zlib1g-dev lsb-release \
         && apt-file update 
 
 RUN apt-get install -y --no-install-recommends \
@@ -31,12 +31,10 @@ ARG GID=1000
 
 ENV LANG C.UTF-8
 
-RUN mkdir -p /home/developer && \
-    echo "developer:x:${UID}:${GID}:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
-    echo "developer:x:${UID}:" >> /etc/group && \
+RUN groupadd -g $GID developer && useradd -u $UID -g $GID developer && echo "developer:developer" | chpasswd && \
+    mkdir -p /home/developer && chown -R developer:developer /home/developer && \
     echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer && \
-    chmod 0440 /etc/sudoers.d/developer && \
-    chown ${UID}:${GID} -R /home/developer
+    chmod 0440 /etc/sudoers.d/developer 
 
 # RUN apt-get install -y --no-install-recommends -t jessie-backports \
 

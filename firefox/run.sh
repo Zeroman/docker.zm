@@ -24,7 +24,7 @@ run_image()
     docker_opts=" --network host"
 
     if [ -d /dev/snd ];then
-        # docker_opts+=" --group-add audio"
+        docker_opts+=" --group-add audio"
         docker_bind+=" --device /dev/snd"
         docker_bind+=" -v /run/dbus/:/run/dbus/"
         docker_bind+=" -v /dev/shm:/dev/shm"

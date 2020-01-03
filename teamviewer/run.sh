@@ -16,20 +16,19 @@ run_image()
 
     name=tv-$(basename $cur_dir)
 
-    hostdev=false
-    if $hostdev;then
-        docker_opts+=" --privileged"
-    fi
+    #docker_opts+=" --net host"
 
     if [ -d /dev/snd ];then
-        # docker_opts+=" --group-add audio"
-        docker_bind+=" --device /dev/snd"
-        docker_bind+=" -v /run/dbus/:/run/dbus/"
-        docker_bind+=" -v /dev/shm:/dev/shm"
+        #docker_opts+=" --group-add audio"
+        #docker_bind+=" --device /dev/snd"
+        #docker_bind+=" -v /run/dbus/:/run/dbus/"
+        #docker_bind+=" -v /dev/shm:/dev/shm"
+        true
     fi
 
-    # mkdir -p $cur_dir/.tv
-    docker_bind+=" -v $cur_dir/.tv:$tv_home/.tv"
+    mkdir -p home
+    docker_bind+=" -v $PWD/home/:/home/developer"
+    docker_bind+=" -v /tmp/.X11-unix:/tmp/.X11-unix"
 
     cmd="teamviewer"
     if [ "$#" != 0 ];then
@@ -47,11 +46,8 @@ run_image()
             #-v $cur_dir:/work -w /work \
             #-e UID=$UID -v $cur_workdir/run.sh:/opt/tv/run.sh \
             #zeroman/tv $cmd
-        mkdir -p home
         xhost +local:docker && docker run --rm -it --name $name \
-            -e UID=$UID -u developer \
-            -v $PWD/home/:/home/developer \
-            -v /tmp/.X11-unix:/tmp/.X11-unix \
+            $docker_opts $docker_bind \
             zeroman/tv
     else
         docker start -i $name
@@ -109,6 +105,15 @@ start_teamview()
         --name teamview hurricane/teamviewer bash
 }
 
+run_tg_dd()
+{
+    xhost +local:docker && docker run --rm -it --net host \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -v $PWD/teamviewer/config/:/opt/teamviewer/config/ \
+        -v $PWD/teamviewer/profile/:/opt/teamviewer/profile/ \
+        -e 'DISPLAY=:0' albertalvarezbruned/teamviewer:14
+}
+
 opt=$1
 if [ -n "$opt" ];then
     shift
@@ -143,6 +148,7 @@ case $opt in
         ;;
     *)
         run_image $*
+        #run_tg_dd
         ;;
 esac
 

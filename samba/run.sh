@@ -1,11 +1,15 @@
 #!/bin/bash - 
 
 
+cur_dir=$PWD
+cur_path=$(readlink -f $0)
+cur_workdir=${cur_path%/*}
+cur_filename=$(basename $cur_path)
 
 case $1 in
     c|clean)
         docker-compose stop 
-        docker-compose rm
+        docker-compose rm -f
         ;;
     shell)
         docker exec -it samba bash
@@ -30,6 +34,6 @@ case $1 in
         mkdir -p -m 0777 $samba_dir
         sudo chown $USER.$USER $samba_dir
         sudo chmod 777 $samba_dir
-        docker-compose up -d
+        docker-compose -f $cur_workdir/docker-compose.yml up -d 
         ;;
 esac

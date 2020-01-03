@@ -35,8 +35,8 @@ run_zm_proxy()
     docker_opts=""
     docker_bind="" 
 
-    # docker_opts+='run -it --rm --name proxy --net=host --privileged'
-    docker_opts='run -i -d --name proxy --net=host --privileged'
+    # docker_opts+='run -it --rm --name proxy --network host --privileged'
+    docker_opts='run -i -d --name proxy --network host --privileged'
     test -z "$http_proxy" || docker_opts+=" -e http_proxy=$http_proxy"
     test -z "$https_proxy" || docker_opts+=" -e https_proxy=$https_proxy"
     test -z "$docker_iface" || docker_opts+=" -e docker_iface=$docker_iface"
@@ -53,9 +53,10 @@ run_zm_proxy()
         docker rm proxy
     fi
     docker $docker_opts $docker_bind zeroman/proxy
+    touch /tmp/.proxy
 }
 
-run_ssr_client()
+run_ssr2_client()
 {
     docker run -it --rm --name ssr_client \
         -p $socks_inport:8388 \
@@ -64,6 +65,17 @@ run_ssr_client()
         sslocal -s 192.168.199.170 -p 3399 \
         -b 0.0.0.0 -l 8388 \
         -k sfjk -m aes-256-cfb -o http_post -O auth_aes128_sha1 -vv
+}
+
+run_ssr_client()
+{
+    docker run -it --rm --name ssr_client \
+        -p $socks_inport:8388 \
+        -p $socks_inport:8388/udp \
+        breakwa11/shadowsocksr \
+        ./local.py -s 35.221.208.34 -p 443 \
+        -b 0.0.0.0 -l 8388 \
+        -k 'orz2019!' -m chacha20-ietf -o 'tls1.2_ticket_auth' -O auth_sha1_v4 -vv
 }
 
 
@@ -94,7 +106,8 @@ case $1 in
         ;;
     c|clean)
         docker stop proxy
-        #docker rm proxy
+        rm -fv /tmp/.proxy
+        docker rm proxy
         # docker rmi zeroman/proxy 
         ;;
     gg)
@@ -117,6 +130,15 @@ case $1 in
         ;;
     socks)
         export socks_proxy=127.0.0.1:$socks_inport
+        run_zm_proxy 
+        ;;
+    show|iptables)
+        #sudo iptables -nv -L
+        sudo iptables -t nat -nvL
+        ;;
+    ts)
+        echo "7071"
+        export socks_proxy=127.0.0.1:7071
         run_zm_proxy 
         ;;
     *)

@@ -24,7 +24,9 @@ run_image()
  
 
 opt=$1
-shift
+if [ -n "$opt" ];then
+    shift
+fi
 case $opt in
     b|build)
         docker build -t zeroman/rsyncd .
@@ -45,7 +47,8 @@ case $opt in
         rsync rsync://test1@localhost:/share 
         ;;
     sync)
-        rsync -avz rsync://$1:/share .
+        rsync -avP --delete rsync://$1:/share .
+        #rsync -avP rsync://$1:/share .
         ;;
     *)
         run_image $*

@@ -26,7 +26,7 @@ run_image()
     fi
 
     if [ -d /dev/snd ];then
-        # docker_opts+=" --group-add audio"
+        #docker_opts+=" --group-add audio"
         docker_bind+=" --device /dev/snd"
         docker_bind+=" -v /run/dbus/:/run/dbus/"
         docker_bind+=" -v /dev/shm:/dev/shm"
@@ -37,6 +37,12 @@ run_image()
         mkdir -p $cur_workdir/cache/winetricks
     fi
     docker_bind+=" -v $cur_workdir/cache/wine:$wine_home/.cache/wine"
+
+   #-e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native \
+    #-v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native \
+    #-v ~/.config/pulse/cookie:/root/.config/pulse/cookie \
+    #--group-add $(getent group audio | cut -d: -f3) \
+    
 
     # mkdir -p $cur_dir/.wine
     docker_bind+=" -v $cur_dir/.wine:$wine_home/.wine"

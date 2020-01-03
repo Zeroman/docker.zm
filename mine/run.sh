@@ -1,48 +1,59 @@
-#!/bin/bash - 
+#!/usr/bin/env sh
 
+cur_dir=$PWD
+cur_path=$(readlink -f $0)
+cur_workdir=${cur_path%/*}
+cur_filename=$(basename $cur_path)
 
-# https://github.com/NVIDIA/nvidia-docker
-# http://blog.csdn.net/smilingc/article/details/53760721
-# https://github.com/CultClassik/nv-docker-equihash-ewbf
-# https://hub.docker.com/u/cultclassik/
+run_image()
+{
+    docker_opts="--device=/dev/kfd --device=/dev/dri --group-add video "
+    docker_bind="" 
 
-wallet=t1Y7Udc4sRAeNeML9CR1HeeUKVEHfRWZ9EN
-pool_server=zec-cn1.dwarfpool.com
-pool_port=3333
-worker=zero_$RANDOM
-# cn1-zcash.flypool.org
+    if [ -e $HOME/.bashrc ];then
+        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
+    fi
 
-case $1 in
-    r)
-        docker run -d --name zcash kmdgeek/nheqminer /nheqminer -l $pool_server:$pool_port -u $wallet.$worker
+    if [ -e $cur_dir/supervisord.conf ];then
+        docker_bind+=" -v $cur_dir/supervisord.conf:/etc/supervisord.conf"
+    fi
+
+    name=ttc-$(basename $cur_dir)-$1
+
+    id=$(docker ps -a --filter name=$name -q)
+    if [ -z "$id" ];then
+        docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+            -v $cur_dir:/work \
+            -w /work \
+            zeroman/ttc $@
+    else
+        docker start -it $name
+    fi
+}
+
+opt=$1
+shift
+case $opt in
+    b|build)
+        docker build -t zeroman/ttc --build-arg GID=$GROUPS --build-arg UID=$UID .
         ;;
-    rnv)
-        # docker run --name zcash_nv --runtime=nvidia 
-        sudo -b nohup nvidia-docker-plugin > /tmp/nvidia-docker.log
-        nvidia-docker run --name zcash_nv \
-            -e "NVIDIA_VISIBLE_DEVICES=1" -e "NVIDIA_DRIVER_CAPABILITIES=compute,utility" \
-            -e "WORKER=$worker" \
-            -e "T_ADDR=$wallet" \
-            -e "INTENSITY=64" \
-            -e "POOL_SERVER=$pool_server" \
-            -e "POOL_PORT=$pool_port" \
-            cultclassik/equihash-ewbf-nv
+    bn|build_new)
+        docker build -t zeroman/ttc --no-cache --build-arg GID=$GROUPS --build-arg UID=$UID .
         ;;
-    lnv)
-        docker logs zcash_nv -f
+    r|run)
+        run_image $@
         ;;
-    l)
-        docker logs zcash -f
+    c|clean)
+        docker rm zeroman/ttc
+        docker rmi zeroman/ttc
         ;;
-    c)
-        docker kill zcash
-        docker rm zcash
+    sd|stop_distcc)
+        name=distccd
+        docker kill $name
+        docker rm $name
         ;;
-    info)
-        # firefox http://zcash.flypool.org/miners/t1Y7Udc4sRAeNeML9CR1HeeUKVEHfRWZ9EN
-        firefox http://dwarfpool.com/zec/address?wallet=$wallet
+    *)
+        run_image 
         ;;
 esac
-
-
 

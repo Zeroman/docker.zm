@@ -4,7 +4,9 @@ RUN wget http://dl.winehq.org/wine-builds/winehq.key && apt-key add winehq.key
 
 RUN echo "deb https://dl.winehq.org/wine-builds/debian/ buster main" > /etc/apt/sources.list.d/wine.list
 
-RUN apt-get update && apt-get install -y --install-recommends winehq-stable winetricks
+RUN apt-get install -y --install-recommends winbind libicu63:i386 mesa-vdpau-drivers:i386 mesa-va-drivers:i386
+
+RUN apt-get update && apt-get install -y --install-recommends winehq-stable #winetricks
 
 # ADD lang.sh /etc/profile.d/
 #RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales

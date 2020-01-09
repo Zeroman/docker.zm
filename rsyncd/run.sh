@@ -10,12 +10,14 @@ run_image()
     docker_opts=""
     docker_bind="" 
 
+    #docker_opts="--net=host "
     name=zeroman.rsyncd-$(basename $cur_dir)
 
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
-        docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
+        docker run -it --rm --name $name $docker_opts $docker_bind \
             -v $cur_dir:/share \
+            -p 873:873
             zeroman/rsyncd 
     else
         docker start -it $name

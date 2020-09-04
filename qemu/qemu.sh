@@ -448,14 +448,15 @@ initConfig()
     vnc_sets="-vnc :$vncPort -vga std"
     #usb_sets="-usb -usbdevice tablet $(genUsbDeviceSet)"
     usb_sets="-usb -device usb-tablet $(genUsbDeviceSet)"
+    audio_sets='-device intel-hda -device hda-duplex' #old=-soundhw hda or -soundhw es1370 
     cache_type=writeback
     test -e "$sys_img" && disk_sets+=" -drive file=${sys_img},if=$sys_disk_type,cache=$cache_type"
     test -e "$temp_img" && disk_sets+=" -drive file=${temp_img},if=$temp_disk_type,cache=$cache_type"
     test -e "$work_img" && disk_sets+=" -drive file=${work_img},if=$work_disk_type,cache=$cache_type"
     test -e "$floppy_img" && disk_sets+=" -fda ${floppy_img}"
     # -cpu kvm64 -M pc 
-    #base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -soundhw hda -m $memSize -enable-kvm -nodefaults -balloon virtio"
-    base_sets="-rtc base=localtime -cpu host -smp cores=$cpuCores -soundhw hda -m $memSize -enable-kvm -nodefaults --device virtio-balloon"
+    #base_sets="-localtime -cpu host -smp cores=$cpuCores,threads=$cpuThreads -m $memSize -enable-kvm -nodefaults -balloon virtio"
+    base_sets="-rtc base=localtime -cpu host -smp cores=$cpuCores -m $memSize -enable-kvm -nodefaults --device virtio-balloon"
     if $daemonize;then
         base_sets+=" --daemonize"
     fi
@@ -468,7 +469,7 @@ initConfig()
     fi
 
     if [ -z "$macaddr" ];then
-        macaddr=08:00:27:23:35:32
+        macaddr=08:00:27:23:35:34
         if [ -n "$sys_img" -a -n "$work_img" ];then
             macaddr=$(printf 'DE:AD:BE:EF:%02X:%02X\n' $((0x$(sha1sum <<<$sys_img|cut -c1-2))) $((0x$(sha1sum <<<$work_img|cut -c1-2))))
         fi
@@ -511,7 +512,8 @@ initConfig()
         ich9_cfg_path=$cur_file_dir/ich9-ehci-uhci.cfg
     fi
 
-    spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
+    #spice_sets="-vga qxl -spice port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
+    spice_sets="-vga none -device qxl-vga,vgamem_mb=64 -spice port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
     # spice_sets="-device virtio-gpu,virgl=on -spice gl=on,port=$spicePort,agent-mouse=on,disable-ticketing,image-compression=off,streaming-video=all"
     # for agent copy and paste
     spice_sets+=" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
@@ -554,7 +556,7 @@ initConfig()
         disk_sets+=" -usb -drive if=none,file=$sd_img,cache=writeback,id=udisk -device usb-storage,drive=udisk,removable=on"
     fi
     # macaddr=88:88:88:88:88:88
-    # base_sets="-localtime -cpu kvm32 -smp cpus=8 -soundhw es1370 -m 2048 -usbdevice tablet -vga vmware"
+    # base_sets="-localtime -cpu kvm32 -smp cpus=8 -m 2048 -usbdevice tablet -vga vmware"
     # net_sets="-net nic,model=virtio,macaddr=$macaddr -net user,smb=/work/com/color/,smbserver=10.0.2.8"
     # share_sets="-virtfs local,path=/work/com/color/,mount_tag=color,readonly"
 
@@ -571,7 +573,7 @@ initConfig()
         fi
     fi
 
-    common_sets=$(echo $base_sets $monitor_sets $net_sets $usb_sets $share_sets $disk_sets $iso_sets $bios_sets $other_args)
+    common_sets=$(echo $base_sets $monitor_sets $net_sets $usb_sets $audio_sets $share_sets $disk_sets $iso_sets $bios_sets $other_args)
     echo "--------------------------------------"
     echo $common_sets
     echo "--------------------------------------"

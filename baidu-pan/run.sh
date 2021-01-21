@@ -6,7 +6,7 @@ cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
 
-# bdpan_home=/home/developer
+# bdpan_home=/home/user
 bdpan_home=/root
 
 run_image()
@@ -17,9 +17,10 @@ run_image()
     name=bdpan-$(basename $cur_dir)
 
     #docker_opts=" --network host"
+    #docker_opts=" --privileged" #一定要加，否则起不来
     mkdir -p $cur_workdir/home
 
-    cmd=bash
+    cmd=""
     if [ -n "$1" ];then
         cmd=$@
     fi
@@ -32,12 +33,15 @@ run_image()
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name $docker_opts $docker_bind \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY -e UID=$UID \
-            -u developer \
-            -v $cur_dir/home:/home/developer \
-            -w //home/developer \
+            -u user \
+            -v $cur_dir/home:/home/user \
+            -w /home/user \
             -e XMODIFIERS=@im=fcitx \
             -e GTK_IM_MODULE=xim \
             -e QT_IM_MODULE=xim \
+            --cap-add=SYS_ADMIN \
+            --device /dev/snd \
+            --device /dev/dri \
             zeroman/bdpan $cmd
     else
         docker start -i $name

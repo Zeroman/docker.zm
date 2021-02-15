@@ -11,7 +11,7 @@ run_image()
     docker_bind="" 
 
     if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
+        docker_bind+=" -v $HOME/.bashrc:/home/user/.bashrc:ro"
     fi
 
     if [ -e $cur_dir/supervisord.conf ];then
@@ -30,7 +30,13 @@ run_image()
             -e GTK_IM_MODULE=xim \
             -e QT_IM_MODULE=xim \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY \
-            -u developer \
+            --cap-add=SYS_ADMIN \
+            --device /dev/snd \
+            -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native \
+            -v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native \
+            --group-add $(getent group audio | cut -d: -f3) \
+            --device /dev/dri \
+            -u user \
             -v $cur_dir:/work \
             -w /work \
             zeroman/x11 $@

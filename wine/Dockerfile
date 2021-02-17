@@ -1,16 +1,22 @@
 FROM zeroman/x11
 
-RUN wget http://dl.winehq.org/wine-builds/winehq.key && apt-key add winehq.key
+#RUN wget http://dl.winehq.org/wine-builds/winehq.key && apt-key add winehq.key
 
-RUN echo "deb https://dl.winehq.org/wine-builds/debian/ buster main" > /etc/apt/sources.list.d/wine.list
+#RUN echo "deb https://dl.winehq.org/wine-builds/debian/ buster main" > /etc/apt/sources.list.d/wine.list
 
-RUN apt-get install -y --install-recommends winbind libicu63:i386 mesa-vdpau-drivers:i386 mesa-va-drivers:i386
+RUN wget https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10/Release.key && apt-key add Release.key
 
-RUN apt-get update && apt-get install -y --install-recommends winehq-stable #winetricks
+#RUN echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10 ./" >> /etc/apt/sources.list.d/wine.list
+RUN echo "deb http://ftp.lysator.liu.se/pub/opensuse/repositories/Emulators:/Wine:/Debian/Debian_10 ./" >> /etc/apt/sources.list.d/wine.list
+
+
+RUN apt-get update && apt-get install -y --install-recommends winbind mesa-va-drivers mesa-vdpau-drivers libicu63:i386 mesa-vdpau-drivers:i386 mesa-va-drivers:i386 pulseaudio:i386
+
+RUN apt-get install -y --install-recommends winehq-stable || apt-get --fix-broken install #winetricks
 
 # ADD lang.sh /etc/profile.d/
 #RUN echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure locales
-RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
+#RUN echo "zh_CN.GB2312 GB2312" > /etc/locale.gen && dpkg-reconfigure locales
 # USER developer
 
 # RUN apt-get install -y # playonlinux

@@ -16,7 +16,7 @@ run_image()
 
     name=wine-$(basename $cur_dir)
 
-    hostdev=true
+    hostdev=false
     if $hostdev;then
         docker_opts+=" --privileged"
     fi
@@ -25,11 +25,15 @@ run_image()
         docker_bind+=" -v $HOME/.bashrc:$wine_home/.bashrc:ro"
     fi
 
+    if [ -e /dev/dri/card0 ];then
+        docker_bind+=" --device /dev/dri/card0"
+    fi
+
     if [ -d /dev/snd ];then
-        #docker_opts+=" --group-add audio"
         docker_bind+=" --device /dev/snd"
-        docker_bind+=" -v /run/dbus/:/run/dbus/"
-        docker_bind+=" -v /dev/shm:/dev/shm"
+        docker_bind+=" -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native "
+        docker_bind+=" -v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native"
+        docker_bind+=" --group-add $(getent group audio | cut -d: -f3)"
     fi
 
     if [ ! -d $cur_workdir/cache ];then

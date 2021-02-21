@@ -11,7 +11,7 @@ run_image()
     docker_bind="" 
 
     if [ -e $HOME/.bashrc ];then
-        docker_bind+=" -v $HOME/.bashrc:/home/developer/.bashrc:ro"
+        docker_bind+=" -v $HOME/.bashrc:/home/user/.bashrc:ro"
     fi
 
     if [ -e $cur_dir/supervisord.conf ];then
@@ -27,7 +27,7 @@ run_image()
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
         docker run -it --rm --name $name --net=host $docker_opts $docker_bind \
-            -u developer \
+            -u user \
             -v $cur_dir:/work \
             -w /work \
             zeroman/base $@

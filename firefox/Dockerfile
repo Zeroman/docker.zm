@@ -1,11 +1,12 @@
 FROM zeroman/x11
 
-#RUN apt-get install -y --no-install-recommends iceweasel
+RUN apt-get install -y --no-install-recommends libpci3 libgtk-3-0 libdbus-glib-1-2
 
 RUN wget -O /tmp/setup "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=zh-CN" \
     && tar xvf /tmp/setup -C /opt \
     && ln -s /opt/firefox/firefox /usr/bin/firefox \
     && rm -fv /tmp/setup
+
 
 ENV TZ=Asia/Hong_Kong
 

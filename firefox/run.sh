@@ -6,7 +6,7 @@ cur_workdir=${cur_path%/*}
 cur_filename=$(basename $cur_path)
 
 
-# firefox_home=/home/developer
+# firefox_home=/home/user
 firefox_home=/root
 
 run_image()
@@ -21,6 +21,7 @@ run_image()
         docker_opts+=" --privileged"
     fi
 
+    #--device /dev/snd 
     docker_opts=" --network host"
 
     if [ -d /dev/snd ];then
@@ -36,20 +37,27 @@ run_image()
     fi
     id=$(docker ps -a --filter name=$name -q)
     if [ -z "$id" ];then
-        pkill firefox
+        pkill -f /usr/lib/firefox/firefox
         # xhost +
         XSOCK=/tmp/.X11-unix
         XAUTH=/tmp/.docker.xauth
         xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
         docker run -it --rm --name $name $docker_opts $docker_bind \
             -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=$DISPLAY -e UID=$UID \
-            -u developer \
-            -v $cur_dir:/home/developer \
+            -u user \
+            -v $cur_dir:/home/user \
             -w /work \
             -e XMODIFIERS=@im=fcitx \
             -e GTK_IM_MODULE=xim \
             -e QT_IM_MODULE=xim \
+            --cap-add=SYS_ADMIN \
+            --device /dev/snd \
+            -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native \
+            -v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native \
+            --group-add $(getent group audio | cut -d: -f3) \
+            --device /dev/dri \
             zeroman/firefox $cmd
+
     else
         docker start -i $name
     fi

@@ -1,0 +1,2 @@
+deb http://mirrors.163.com/debian/ stable main non-free contrib
+deb https://repo.debiancn.org/ stable main

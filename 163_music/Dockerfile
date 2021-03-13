@@ -11,4 +11,8 @@ RUN wget https://repo.debiancn.org/pool/main/d/debiancn-keyring/debiancn-keyring
 
 RUN apt-get install -y netease-cloud-music
 
+ADD netease-cloud-music_1.2.0_amd64_deepin_stable_20190424.deb /tmp
+
+RUN dpkg -i /tmp/netease-cloud-music_1.2.0_amd64_deepin_stable_20190424.deb
+
 CMD ["netease-cloud-music"]
